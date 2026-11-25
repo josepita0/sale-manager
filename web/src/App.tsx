@@ -5,10 +5,7 @@ import type { Profile } from './lib/types'
 import { AppHeader, Splash } from './components/AppHeader'
 import { Login } from './screens/Login'
 import { BartenderShift } from './screens/BartenderShift'
-
-function Placeholder({ title }: { title: string }) {
-  return <p className="p-6 text-neutral-400">{title} (en construcción…)</p>
-}
+import { EncargadoHome } from './screens/EncargadoHome'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -63,7 +60,7 @@ export default function App() {
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
       {header}
       {profile.role === 'encargado' ? (
-        <Placeholder title="Vista de encargado" />
+        <EncargadoHome />
       ) : (
         <BartenderShift profile={profile} />
       )}
