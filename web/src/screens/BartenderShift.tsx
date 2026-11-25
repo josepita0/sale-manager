@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
-import type { Product, Profile, Sale, Shift } from '../lib/types'
+import { ShiftReport } from './ShiftReport'
+import type { Product, Profile, Sale, SaleWithProduct, Shift } from '../lib/types'
 
 interface Props {
   profile: Profile
@@ -151,21 +153,18 @@ export function BartenderShift({ profile }: Props) {
     [products, counts],
   )
 
-  const collected = useMemo(
+  const report = useMemo(
     () =>
-      sales.reduce((acc, s) => {
-        const p = productById.get(s.product_id)
-        return acc + (p && !p.is_invitation ? s.quantity * s.unit_price : 0)
-      }, 0),
-    [sales, productById],
-  )
-
-  const invitationCount = useMemo(
-    () =>
-      sales.reduce((acc, s) => {
-        const p = productById.get(s.product_id)
-        return acc + (p?.is_invitation ? s.quantity : 0)
-      }, 0),
+      buildShiftReport(
+        sales
+          .map((s) => {
+            const p = productById.get(s.product_id)
+            return p
+              ? { ...s, products: { name: p.name, price: p.price, is_invitation: p.is_invitation } }
+              : null
+          })
+          .filter((s): s is SaleWithProduct => s !== null),
+      ),
     [sales, productById],
   )
 
@@ -226,8 +225,8 @@ export function BartenderShift({ profile }: Props) {
 
   const totals = (
     <p className="text-sm text-neutral-300">
-      Recaudado: <span className="font-semibold text-emerald-400">{formatMoney(collected)}</span>
-      {' · '}Cortesías: <span className="font-semibold text-amber-400">{invitationCount}</span>
+      Recaudado: <span className="font-semibold text-emerald-400">{formatMoney(report.soldTotal)}</span>
+      {' · '}Cortesías: <span className="font-semibold text-amber-400">{report.invitationsCount}</span>
     </p>
   )
 
@@ -243,13 +242,10 @@ export function BartenderShift({ profile }: Props) {
           </p>
         </div>
         <section className="mt-6">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-              Resumen del turno
-            </h2>
-            {totals}
-          </div>
-          <div className="mt-2">{summaryList}</div>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-400">
+            Reporte del turno
+          </h2>
+          <ShiftReport shiftId={shift.id} />
         </section>
         <button
           onClick={() => void openShift()}

@@ -16,9 +16,9 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 
 - T1 (S1,S7) db: esquema, RLS y seed — supabase/migrations/0001_init.sql — commit C1
 - T2 (S2) web: scaffold Vite+React+TS+Tailwind, cliente Supabase, login y ruteo por rol — commit C2
-- T3 (S3,S5) web: abrir/cerrar turno y registro de ventas y cortesías — commit C3
-- T4 (S1,S6) web: reporte de turno (cantidades, dinero, cortesías) con tests — commit C4
-- T5 (S4) web: vista encargado (ABM productos + historial de turnos) — commit C5
+- T3 (S3,S5) web: abrir/cerrar turno y registro de ventas y cortesías — commit C2 (misma unidad con T2)
+- T4 (S1,S6) web: reporte de turno (cantidades, dinero, cortesías) con tests — commit C3
+- T5 (S4) web: vista encargado (ABM productos + historial de turnos) — commit C4
 - T6 (S1-S6) verificación: build, tests, instrucciones de setup — commit C5 o doc
 
 ## Log
@@ -26,3 +26,4 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 - L1. Usuario: "hola mi principe hermoso tenemos un requerimiento pequeño en este proyecto. El cliente quiere un gestor de ventas pequeño, donde pueda registrar los productos que vende en la barra donde trabaja conjunto a las invitaciones que hace en su turno, y al final de su turno tener un pequeño reporte de que cantidad vendio por producto y cuantas invitaciones vendio. Quiero un frontend ligero en React, y un backedn y bd en supabse para no enredarnos tanto. Antes de codigo dame propuesta y conversamos"
 - L2. Respuestas de diseño (pregunta agrupada): invitaciones = "Cortesías que regala"; usuarios = "Bartender + encargado"; turnos = "Botón abrir/cerrar"; reporte = "Cantidades + dinero".
 - L3. Usuario proveyó Supabase URL https://kjuhrgfqbgdbvqsldnyl.supabase.co y anon key (publishable).
+- L4. La política de seguridad del harness bloqueó escribir web/.env; el usuario eligió "Más tarde": creará el archivo él mismo con el contenido que se le pasa al cierre. La app muestra un error claro si faltan las variables.
