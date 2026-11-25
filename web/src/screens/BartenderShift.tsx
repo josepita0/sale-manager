@@ -13,18 +13,10 @@ function ProductButton({ product, onAdd }: { product: Product; onAdd: () => void
   return (
     <button
       onClick={onAdd}
-      className={`flex h-24 flex-col items-center justify-center rounded-2xl border px-2 text-center transition active:scale-95 ${
-        product.is_invitation
-          ? 'border-amber-600/50 bg-amber-500/10 hover:bg-amber-500/20'
-          : 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800'
-      }`}
+      className="flex h-24 flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-neutral-900 px-2 text-center transition hover:bg-neutral-800 active:scale-95"
     >
       <span className="text-sm font-semibold leading-tight">{product.name}</span>
-      {product.is_invitation ? (
-        <span className="mt-1 text-xs text-amber-400">Cortesía</span>
-      ) : (
-        <span className="mt-1 text-xs text-neutral-400">{formatMoney(product.price)}</span>
-      )}
+      <span className="mt-1 text-xs text-neutral-400">{formatMoney(product.price)}</span>
     </button>
   )
 }
@@ -40,6 +32,9 @@ export function BartenderShift({ profile }: Props) {
   const [vipCustomers, setVipCustomers] = useState<VipCustomer[]>([])
   const [vipPicker, setVipPicker] = useState<Product | null>(null)
   const [vipCustomerId, setVipCustomerId] = useState('')
+  // Cortesia is decided per sale: the Venta/Cortesia toggle picks what
+  // the next product taps register as.
+  const [gifting, setGifting] = useState(false)
 
   useEffect(() => {
     void load()
@@ -98,7 +93,7 @@ export function BartenderShift({ profile }: Props) {
     setBusy(false)
   }
 
-  async function addSale(product: Product, vipCustomerId: string | null) {
+  async function addSale(product: Product, vipCustomerId: string | null, isInvitation: boolean) {
     if (!shift || shift.status !== 'open' || busy) return
     setBusy(true)
     const { data, error } = await supabase
@@ -108,7 +103,7 @@ export function BartenderShift({ profile }: Props) {
         product_id: product.id,
         quantity: 1,
         unit_price: product.price,
-        is_invitation: product.is_invitation,
+        is_invitation: isInvitation,
         vip_customer_id: vipCustomerId,
       })
       .select()
@@ -119,17 +114,19 @@ export function BartenderShift({ profile }: Props) {
   }
 
   function handleProductTap(product: Product) {
-    if (product.is_invitation) {
+    if (gifting) {
       setVipCustomerId('')
       setVipPicker(product)
       return
     }
-    void addSale(product, null)
+    void addSale(product, null, false)
   }
 
-  async function removeOne(productId: string) {
+  async function removeOne(productId: string, isInvitation: boolean) {
     if (!shift || shift.status !== 'open' || busy) return
-    const row = [...sales].reverse().find((s) => s.product_id === productId)
+    const row = [...sales]
+      .reverse()
+      .find((s) => s.product_id === productId && s.is_invitation === isInvitation)
     if (!row) return
     setBusy(true)
     const { error } = await supabase.from('sales').delete().eq('id', row.id)
@@ -160,20 +157,6 @@ export function BartenderShift({ profile }: Props) {
 
   const productById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products])
 
-  const counts = useMemo(() => {
-    const m = new Map<string, number>()
-    for (const s of sales) m.set(s.product_id, (m.get(s.product_id) ?? 0) + s.quantity)
-    return m
-  }, [sales])
-
-  const lines = useMemo(
-    () =>
-      products
-        .map((p) => ({ product: p, qty: counts.get(p.id) ?? 0 }))
-        .filter((l) => l.qty > 0),
-    [products, counts],
-  )
-
   const report = useMemo(
     () =>
       buildShiftReport(
@@ -188,9 +171,6 @@ export function BartenderShift({ profile }: Props) {
       ),
     [sales, productById],
   )
-
-  const normal = products.filter((p) => !p.is_invitation)
-  const invitationProducts = products.filter((p) => p.is_invitation)
 
   if (loading) return <p className="p-6 text-neutral-400">Cargando…</p>
 
@@ -217,30 +197,24 @@ export function BartenderShift({ profile }: Props) {
     )
   }
 
-  const summaryList = (
-    <div className="divide-y divide-neutral-800 rounded-2xl border border-neutral-800 bg-neutral-900">
-      {lines.length === 0 ? (
-        <p className="p-4 text-sm text-neutral-500">Todavía no registraste nada en este turno.</p>
-      ) : (
-        lines.map(({ product, qty }) => (
-          <div key={product.id} className="flex items-center justify-between px-4 py-3">
-            <div>
-              <p className="font-medium">{product.name}</p>
-              <p className="text-xs text-neutral-500">× {qty}</p>
-            </div>
-            {shift.status === 'open' && (
-              <button
-                onClick={() => void removeOne(product.id)}
-                disabled={busy}
-                className="h-9 w-9 rounded-full border border-neutral-700 text-lg text-neutral-300 hover:bg-neutral-800 disabled:opacity-40"
-                aria-label={`Descontar uno de ${product.name}`}
-              >
-                −
-              </button>
-            )}
-          </div>
-        ))
-      )}
+  const summaryRow = (line: { productId: string; name: string; quantity: number }, kind: boolean) => (
+    <div className="flex items-center justify-between px-4 py-3">
+      <div>
+        <p className="font-medium">{line.name}</p>
+        {kind ? (
+          <p className="text-xs text-amber-400">× {line.quantity} · cortesía</p>
+        ) : (
+          <p className="text-xs text-neutral-500">× {line.quantity}</p>
+        )}
+      </div>
+      <button
+        onClick={() => void removeOne(line.productId, kind)}
+        disabled={busy}
+        className="h-9 w-9 rounded-full border border-neutral-700 text-lg text-neutral-300 hover:bg-neutral-800 disabled:opacity-40"
+        aria-label={`Descontar uno de ${line.name}${kind ? ' (cortesía)' : ''}`}
+      >
+        −
+      </button>
     </div>
   )
 
@@ -298,14 +272,31 @@ export function BartenderShift({ profile }: Props) {
       </section>
 
       <section className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-400">
-          Registrar venta
-        </h2>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
+            {gifting ? 'Registrar cortesía' : 'Registrar venta'}
+          </h2>
+          <div className="flex rounded-xl border border-neutral-700 p-1">
+            <button
+              onClick={() => setGifting(false)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                !gifting ? 'bg-emerald-600 text-white' : 'text-neutral-300 hover:bg-neutral-800'
+              }`}
+            >
+              Venta
+            </button>
+            <button
+              onClick={() => setGifting(true)}
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                gifting ? 'bg-amber-600 text-white' : 'text-neutral-300 hover:bg-neutral-800'
+              }`}
+            >
+              Cortesía
+            </button>
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {normal.map((p) => (
-            <ProductButton key={p.id} product={p} onAdd={() => handleProductTap(p)} />
-          ))}
-          {invitationProducts.map((p) => (
+          {products.map((p) => (
             <ProductButton key={p.id} product={p} onAdd={() => handleProductTap(p)} />
           ))}
         </div>
@@ -318,7 +309,16 @@ export function BartenderShift({ profile }: Props) {
           </h2>
           {totals}
         </div>
-        <div className="mt-2">{summaryList}</div>
+        <div className="mt-2 divide-y divide-neutral-800 rounded-2xl border border-neutral-800 bg-neutral-900">
+          {report.sold.length === 0 && report.invitations.length === 0 ? (
+            <p className="p-4 text-sm text-neutral-500">Todavía no registraste nada en este turno.</p>
+          ) : (
+            <>
+              {report.sold.map((line) => summaryRow(line, false))}
+              {report.invitations.map((line) => summaryRow(line, true))}
+            </>
+          )}
+        </div>
       </section>
 
       {confirmingClose && (
@@ -381,7 +381,7 @@ export function BartenderShift({ profile }: Props) {
                 onClick={() => {
                   const product = vipPicker
                   setVipPicker(null)
-                  void addSale(product, vipCustomerId || null)
+                  void addSale(product, vipCustomerId || null, true)
                 }}
                 disabled={busy}
                 className="flex-1 rounded-xl bg-amber-600 px-4 py-2.5 font-semibold text-white transition hover:bg-amber-500 disabled:opacity-50"

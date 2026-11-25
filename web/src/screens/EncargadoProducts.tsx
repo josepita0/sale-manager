@@ -14,7 +14,6 @@ function ProductForm({
 }) {
   const [name, setName] = useState(initial?.name ?? '')
   const [price, setPrice] = useState(initial ? String(initial.price) : '')
-  const [isInvitation, setIsInvitation] = useState(initial?.is_invitation ?? false)
   const [busy, setBusy] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
@@ -29,7 +28,7 @@ function ProductForm({
       return
     }
     setBusy(true)
-    const payload = { name: name.trim(), price: parsedPrice, is_invitation: isInvitation }
+    const payload = { name: name.trim(), price: parsedPrice }
     const { error } = initial
       ? await supabase.from('products').update(payload).eq('id', initial.id)
       : await supabase.from('products').insert(payload)
@@ -74,15 +73,10 @@ function ProductForm({
           className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 outline-none focus:border-emerald-500"
         />
       </div>
-      <label className="flex items-center gap-2 text-sm text-neutral-300">
-        <input
-          type="checkbox"
-          checked={isInvitation}
-          onChange={(e) => setIsInvitation(e.target.checked)}
-          className="h-4 w-4 accent-amber-500"
-        />
-        Es cortesía (no se cobra, entra al reporte aparte)
-      </label>
+      <p className="text-xs text-neutral-500">
+        Vender o regalar se decide al momento de la venta, con el modo Venta/Cortesía de la
+        pantalla de turno.
+      </p>
       <div className="flex gap-3">
         <button
           type="submit"
@@ -193,11 +187,7 @@ export function ProductsTab() {
                   {p.name}
                 </p>
                 <p className="text-xs text-neutral-500">
-                  {p.is_invitation ? (
-                    <span className="text-amber-400">Cortesía</span>
-                  ) : (
-                    formatMoney(p.price)
-                  )}
+                  {formatMoney(p.price)}
                   {!p.active && ' · Inactiva'}
                 </p>
               </div>

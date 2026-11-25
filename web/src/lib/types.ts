@@ -10,7 +10,6 @@ export interface Product {
   id: string
   name: string
   price: number
-  is_invitation: boolean
   active: boolean
 }
 

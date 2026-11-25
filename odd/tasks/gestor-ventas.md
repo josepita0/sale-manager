@@ -14,6 +14,7 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 S8. "El repo va a ser publico, entonces quiero las mejores praxis, estructura, etc" — LICENSE MIT, CI, README público, .env.example, origin https://github.com/josepita0/sale-manager.git.
 S9. "me gustaria que opcionalmente puedas agregar un apartado de 'clientes vip' que sea opcional, si selecciona 'is_invitation' se aperture un select con los 'clientes vip' previamente cargados" — al registrar una cortesía se abre un select opcional de clientes VIP; el encargado los administra.
 S10. Usuario eligió "Pestaña 'Mi turno'": el encargado también tiene el flujo completo del bartender (abrir/cerrar turno, registrar, reporte) dentro de su vista, junto a las pestañas admin.
+S11. "La logica de la cortesia esta mal implementada. No es producto sino por venta" — la cortesía se decide al momento de cada venta (modo Venta/Cortesía en la pantalla de turno), no por el tipo de producto; el catálogo deja de tener el flag.
 
 ## Tasks
 
@@ -28,6 +29,7 @@ S10. Usuario eligió "Pestaña 'Mi turno'": el encargado también tiene el flujo
 - T9 (S8) prácticas repo público (LICENSE, CI, README, .env.example) — commit docs
 - T10 (S1-S9) revisión nativa del nuevo candidato y push a origin
 - T11 (S10) pestaña "Mi turno" del encargado reutilizando BartenderShift
+- T12 (S11) cortesía por venta: modo Venta/Cortesía, sin flag de producto — migration 0004
 
 ## Log
 
@@ -41,3 +43,4 @@ S10. Usuario eligió "Pestaña 'Mi turno'": el encargado también tiene el flujo
 - L8. Usuario: "Este es el repo remoto al que vas a agregar el origin: https://github.com/josepita0/sale-manager.git El repo va a ser publico, entonces quiero las mejores praxis, estructura, etc" → origin agregado; LICENSE MIT, CI, README público; push tras revisar el nuevo candidato.
 - L9. Revisión nativa del nuevo candidato (base d1c9d9e, linaje review-c1ac67f0f07535fe): APROBADA. Un hallazgo no bloqueante (vipRes.error sin chequear en load(): lista VIP silenciosamente vacía si falla la query) — queda como follow-up.
 - L10. Usuario preguntó por las vistas de venta del encargado y eligió "Pestaña 'Mi turno'": EncargadoHome recibe profile y agrega la pestaña que monta BartenderShift (RLS ya lo permitía; el turno queda a nombre del encargado).
+- L11. Usuario: "La logica de la cortesia esta mal implementada. No es producto sino por venta" → migration 0004 (elimina products.is_invitation y los productos cortesía de ejemplo), modo Venta/Cortesía en la pantalla de turno, resumen del turno dividido en ventas y cortesías (− por tipo). sales.is_invitation (snapshot) queda como única fuente de clasificación.
