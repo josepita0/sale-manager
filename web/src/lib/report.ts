@@ -23,7 +23,9 @@ export interface ShiftReportData {
 
 /**
  * Aggregates the raw sale rows of one shift into report lines.
- * Cortesías (is_invitation) are kept separate from sold products.
+ * Cortesías are classified from the sale-level snapshot
+ * (sale.is_invitation, taken at insert time), so later edits to the
+ * product catalog never retroactively reclassify past sales.
  * Each sale keeps its own unit_price snapshot, so price changes
  * mid-shift are respected row by row.
  */
@@ -32,7 +34,7 @@ export function buildShiftReport(sales: SaleWithProduct[]): ShiftReportData {
   const invitationMap = new Map<string, ReportLine>()
 
   for (const sale of sales) {
-    const target = sale.products.is_invitation ? invitationMap : soldMap
+    const target = sale.is_invitation ? invitationMap : soldMap
     const line = target.get(sale.product_id) ?? {
       productId: sale.product_id,
       name: sale.products.name,

@@ -10,8 +10,9 @@ function makeSale(overrides: Partial<SaleWithProduct> & { product_id: string }):
     product_id,
     quantity: 1,
     unit_price: 1000,
+    is_invitation: false,
     created_at: '2024-01-01T00:00:00Z',
-    products: { name: 'Producto', price: 1000, is_invitation: false },
+    products: { name: 'Producto', price: 1000 },
     ...rest,
   }
 }
@@ -28,9 +29,9 @@ describe('buildShiftReport', () => {
 
   it('agrupa cantidades por producto y calcula subtotales y total', () => {
     const report = buildShiftReport([
-      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500, is_invitation: false }, quantity: 3, unit_price: 3500 }),
-      makeSale({ product_id: 'gin', products: { name: 'Gin Tonic', price: 5500, is_invitation: false }, quantity: 1, unit_price: 5500 }),
-      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500, is_invitation: false }, quantity: 2, unit_price: 3500 }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 3, unit_price: 3500 }),
+      makeSale({ product_id: 'gin', products: { name: 'Gin Tonic', price: 5500 }, quantity: 1, unit_price: 5500 }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 2, unit_price: 3500 }),
     ])
     expect(report.sold).toHaveLength(2)
     const cerveza = report.sold.find((l) => l.name === 'Cerveza')
@@ -45,9 +46,9 @@ describe('buildShiftReport', () => {
 
   it('separa las cortesías de las ventas y calcula el valor regalado', () => {
     const report = buildShiftReport([
-      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500, is_invitation: false }, quantity: 2, unit_price: 3500 }),
-      makeSale({ product_id: 'cortesia-trago', products: { name: 'Cortesía Trago', price: 5000, is_invitation: true }, quantity: 1, unit_price: 5000 }),
-      makeSale({ product_id: 'cortesia-cerveza', products: { name: 'Cortesía Cerveza', price: 3500, is_invitation: true }, quantity: 2, unit_price: 3500 }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 2, unit_price: 3500 }),
+      makeSale({ product_id: 'cortesia-trago', products: { name: 'Cortesía Trago', price: 5000 }, is_invitation: true, quantity: 1, unit_price: 5000 }),
+      makeSale({ product_id: 'cortesia-cerveza', products: { name: 'Cortesía Cerveza', price: 3500 }, is_invitation: true, quantity: 2, unit_price: 3500 }),
     ])
     expect(report.sold).toHaveLength(1)
     expect(report.soldTotal).toBe(7000)
@@ -56,10 +57,39 @@ describe('buildShiftReport', () => {
     expect(report.giftedValue).toBe(12000)
   })
 
+  it('clasifica desde el snapshot de la venta: el flag del producto no afecta el reporte', () => {
+    // The product row now says "sold" for the cortesia product and
+    // "invitation" for cerveza, but the sale snapshots decide.
+    const report = buildShiftReport([
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 2, unit_price: 3500, is_invitation: true }),
+      makeSale({ product_id: 'cortesia-trago', products: { name: 'Cortesía Trago', price: 5000 }, is_invitation: false, quantity: 1, unit_price: 5000 }),
+    ])
+    expect(report.sold).toHaveLength(1)
+    expect(report.sold[0].name).toBe('Cortesía Trago')
+    expect(report.soldTotal).toBe(5000)
+    expect(report.invitations).toHaveLength(1)
+    expect(report.invitations[0].name).toBe('Cerveza')
+    expect(report.invitationsCount).toBe(2)
+    expect(report.giftedValue).toBe(7000)
+  })
+
+  it('un mismo producto puede aparecer vendido y regalado en el mismo turno', () => {
+    const report = buildShiftReport([
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 2, unit_price: 3500, is_invitation: false }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 1, unit_price: 3500, is_invitation: true }),
+    ])
+    expect(report.sold).toHaveLength(1)
+    expect(report.sold[0].quantity).toBe(2)
+    expect(report.soldTotal).toBe(7000)
+    expect(report.invitations).toHaveLength(1)
+    expect(report.invitations[0].quantity).toBe(1)
+    expect(report.invitationsCount).toBe(1)
+  })
+
   it('usa el precio registrado en cada venta cuando cambió a mitad del turno', () => {
     const report = buildShiftReport([
-      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500, is_invitation: false }, quantity: 2, unit_price: 3000 }),
-      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500, is_invitation: false }, quantity: 1, unit_price: 3500 }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 2, unit_price: 3000 }),
+      makeSale({ product_id: 'cerveza', products: { name: 'Cerveza', price: 3500 }, quantity: 1, unit_price: 3500 }),
     ])
     const cerveza = report.sold[0]
     expect(cerveza.quantity).toBe(3)

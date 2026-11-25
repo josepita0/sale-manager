@@ -16,25 +16,6 @@ function ProductForm({
   const [price, setPrice] = useState(initial ? String(initial.price) : '')
   const [isInvitation, setIsInvitation] = useState(initial?.is_invitation ?? false)
   const [busy, setBusy] = useState(false)
-  // Once a product has sales, its sold/cortesia classification is frozen:
-  // reports keep their category even if the catalog changes later.
-  const [hasSales, setHasSales] = useState<boolean | null>(initial ? null : false)
-
-  useEffect(() => {
-    if (!initial) return
-    let cancelled = false
-    supabase
-      .from('sales')
-      .select('id')
-      .eq('product_id', initial.id)
-      .limit(1)
-      .then(({ data }) => {
-        if (!cancelled) setHasSales((data?.length ?? 0) > 0)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [initial])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -48,10 +29,7 @@ function ProductForm({
       return
     }
     setBusy(true)
-    const payload: { name: string; price: number; is_invitation?: boolean } =
-      initial && hasSales
-        ? { name: name.trim(), price: parsedPrice }
-        : { name: name.trim(), price: parsedPrice, is_invitation: isInvitation }
+    const payload = { name: name.trim(), price: parsedPrice, is_invitation: isInvitation }
     const { error } = initial
       ? await supabase.from('products').update(payload).eq('id', initial.id)
       : await supabase.from('products').insert(payload)
@@ -101,24 +79,17 @@ function ProductForm({
           type="checkbox"
           checked={isInvitation}
           onChange={(e) => setIsInvitation(e.target.checked)}
-          disabled={hasSales === true}
           className="h-4 w-4 accent-amber-500"
         />
         Es cortesía (no se cobra, entra al reporte aparte)
       </label>
-      {hasSales && (
-        <p className="text-xs text-amber-400">
-          Tiene ventas registradas: no se puede cambiar entre venta y cortesía para no alterar los
-          reportes anteriores.
-        </p>
-      )}
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={busy || (initial !== null && hasSales === null)}
+          disabled={busy}
           className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
         >
-          {busy || (initial !== null && hasSales === null) ? 'Verificando…' : 'Guardar'}
+          Guardar
         </button>
       </div>
     </form>

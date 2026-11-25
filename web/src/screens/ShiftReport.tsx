@@ -19,7 +19,7 @@ export function ShiftReport({ shiftId }: Props) {
     setError(null)
     supabase
       .from('shifts')
-      .select('*, profiles(full_name), sales(*, products(name, price, is_invitation))')
+      .select('*, profiles(full_name), sales(*, products(name, price))')
       .eq('id', shiftId)
       .single()
       .then(({ data, error }) => {

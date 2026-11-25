@@ -14,6 +14,12 @@ export interface Product {
   active: boolean
 }
 
+export interface VipCustomer {
+  id: string
+  name: string
+  active: boolean
+}
+
 export interface Shift {
   id: string
   bartender_id: string
@@ -28,12 +34,15 @@ export interface Sale {
   product_id: string
   quantity: number
   unit_price: number
+  /** Snapshot taken at sale time; reports never read the product flag. */
+  is_invitation: boolean
+  vip_customer_id: string | null
   created_at: string
 }
 
 /** Sale row with its product embedded (PostgREST select). */
 export interface SaleWithProduct extends Sale {
-  products: Pick<Product, 'name' | 'price' | 'is_invitation'>
+  products: Pick<Product, 'name' | 'price'>
 }
 
 /** Shift row with bartender name and its sales embedded. */

@@ -98,7 +98,13 @@ export function BartenderShift({ profile }: Props) {
     setBusy(true)
     const { data, error } = await supabase
       .from('sales')
-      .insert({ shift_id: shift.id, product_id: product.id, quantity: 1, unit_price: product.price })
+      .insert({
+        shift_id: shift.id,
+        product_id: product.id,
+        quantity: 1,
+        unit_price: product.price,
+        is_invitation: product.is_invitation,
+      })
       .select()
       .single()
     if (error) setError('No se pudo registrar: ' + error.message)
@@ -160,7 +166,7 @@ export function BartenderShift({ profile }: Props) {
           .map((s) => {
             const p = productById.get(s.product_id)
             return p
-              ? { ...s, products: { name: p.name, price: p.price, is_invitation: p.is_invitation } }
+              ? { ...s, products: { name: p.name, price: p.price } }
               : null
           })
           .filter((s): s is SaleWithProduct => s !== null),
