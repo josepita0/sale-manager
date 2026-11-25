@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { HistoryTab } from './EncargadoHistory'
 import { ProductsTab } from './EncargadoProducts'
+import { VipCustomersTab } from './EncargadoVipCustomers'
 
-type Tab = 'productos' | 'turnos'
+type Tab = 'productos' | 'turnos' | 'clientes'
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
   return (
@@ -29,8 +30,13 @@ export function EncargadoHome() {
         <TabButton active={tab === 'turnos'} onClick={() => setTab('turnos')}>
           Turnos
         </TabButton>
+        <TabButton active={tab === 'clientes'} onClick={() => setTab('clientes')}>
+          Clientes VIP
+        </TabButton>
       </div>
-      <div className="mt-4">{tab === 'productos' ? <ProductsTab /> : <HistoryTab />}</div>
+      <div className="mt-4">
+        {tab === 'productos' ? <ProductsTab /> : tab === 'turnos' ? <HistoryTab /> : <VipCustomersTab />}
+      </div>
     </main>
   )
 }

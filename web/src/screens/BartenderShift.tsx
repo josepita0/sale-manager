@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
 import { ShiftReport } from './ShiftReport'
-import type { Product, Profile, Sale, SaleWithProduct, Shift } from '../lib/types'
+import type { Product, Profile, Sale, SaleWithProduct, Shift, VipCustomer } from '../lib/types'
 
 interface Props {
   profile: Profile
@@ -37,6 +37,9 @@ export function BartenderShift({ profile }: Props) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmingClose, setConfirmingClose] = useState(false)
+  const [vipCustomers, setVipCustomers] = useState<VipCustomer[]>([])
+  const [vipPicker, setVipPicker] = useState<Product | null>(null)
+  const [vipCustomerId, setVipCustomerId] = useState('')
 
   useEffect(() => {
     void load()
@@ -46,7 +49,7 @@ export function BartenderShift({ profile }: Props) {
   async function load() {
     setLoading(true)
     setError(null)
-    const [productsRes, shiftRes] = await Promise.all([
+    const [productsRes, shiftRes, vipRes] = await Promise.all([
       supabase.from('products').select('*').eq('active', true).order('name'),
       supabase
         .from('shifts')
@@ -54,6 +57,7 @@ export function BartenderShift({ profile }: Props) {
         .eq('bartender_id', profile.id)
         .eq('status', 'open')
         .maybeSingle(),
+      supabase.from('vip_customers').select('*').eq('active', true).order('name'),
     ])
     if (productsRes.error || shiftRes.error) {
       setError(
@@ -63,6 +67,7 @@ export function BartenderShift({ profile }: Props) {
     const loadedProducts = (productsRes.data ?? []) as Product[]
     const loadedShift = (shiftRes.data ?? null) as Shift | null
     setProducts(loadedProducts)
+    setVipCustomers((vipRes.data ?? []) as VipCustomer[])
     setShift(loadedShift)
     if (loadedShift) {
       const { data } = await supabase
@@ -93,7 +98,7 @@ export function BartenderShift({ profile }: Props) {
     setBusy(false)
   }
 
-  async function addSale(product: Product) {
+  async function addSale(product: Product, vipCustomerId: string | null) {
     if (!shift || shift.status !== 'open' || busy) return
     setBusy(true)
     const { data, error } = await supabase
@@ -104,12 +109,22 @@ export function BartenderShift({ profile }: Props) {
         quantity: 1,
         unit_price: product.price,
         is_invitation: product.is_invitation,
+        vip_customer_id: vipCustomerId,
       })
       .select()
       .single()
     if (error) setError('No se pudo registrar: ' + error.message)
     else setSales((prev) => [...prev, data as Sale])
     setBusy(false)
+  }
+
+  function handleProductTap(product: Product) {
+    if (product.is_invitation) {
+      setVipCustomerId('')
+      setVipPicker(product)
+      return
+    }
+    void addSale(product, null)
   }
 
   async function removeOne(productId: string) {
@@ -288,10 +303,10 @@ export function BartenderShift({ profile }: Props) {
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {normal.map((p) => (
-            <ProductButton key={p.id} product={p} onAdd={() => void addSale(p)} />
+            <ProductButton key={p.id} product={p} onAdd={() => handleProductTap(p)} />
           ))}
           {invitationProducts.map((p) => (
-            <ProductButton key={p.id} product={p} onAdd={() => void addSale(p)} />
+            <ProductButton key={p.id} product={p} onAdd={() => handleProductTap(p)} />
           ))}
         </div>
       </section>
@@ -326,6 +341,52 @@ export function BartenderShift({ profile }: Props) {
                 className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 font-semibold text-white transition hover:bg-red-500 disabled:opacity-50"
               >
                 Cerrar turno
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {vipPicker && (
+        <div className="fixed inset-0 z-10 flex items-center justify-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
+            <h3 className="text-lg font-semibold">Cortesía: {vipPicker.name}</h3>
+            <p className="mt-1 text-sm text-neutral-400">¿Para qué cliente VIP es? (opcional)</p>
+            <select
+              value={vipCustomerId}
+              onChange={(e) => setVipCustomerId(e.target.value)}
+              className="mt-3 w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 text-neutral-100 outline-none focus:border-emerald-500"
+            >
+              <option value="">Sin asignar</option>
+              {vipCustomers.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+            {vipCustomers.length === 0 && (
+              <p className="mt-2 text-xs text-neutral-500">
+                Todavía no hay clientes VIP cargados: el encargado los administra en “Clientes
+                VIP”.
+              </p>
+            )}
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setVipPicker(null)}
+                className="flex-1 rounded-xl border border-neutral-700 px-4 py-2.5 transition hover:bg-neutral-800"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  const product = vipPicker
+                  setVipPicker(null)
+                  void addSale(product, vipCustomerId || null)
+                }}
+                disabled={busy}
+                className="flex-1 rounded-xl bg-amber-600 px-4 py-2.5 font-semibold text-white transition hover:bg-amber-500 disabled:opacity-50"
+              >
+                Registrar cortesía
               </button>
             </div>
           </div>
