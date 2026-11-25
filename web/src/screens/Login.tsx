@@ -19,7 +19,7 @@ export function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
-        <h1 className="text-center text-2xl font-bold text-neutral-100">🍸 Gestor de Barra</h1>
+        <h1 className="text-center text-3xl font-bold tracking-tight text-neutral-100">Naira's</h1>
         <p className="mt-1 text-center text-sm text-neutral-400">Ventas y cortesías de tu turno</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">

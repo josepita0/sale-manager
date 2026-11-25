@@ -15,6 +15,7 @@ S8. "El repo va a ser publico, entonces quiero las mejores praxis, estructura, e
 S9. "me gustaria que opcionalmente puedas agregar un apartado de 'clientes vip' que sea opcional, si selecciona 'is_invitation' se aperture un select con los 'clientes vip' previamente cargados" — al registrar una cortesía se abre un select opcional de clientes VIP; el encargado los administra.
 S10. Usuario eligió "Pestaña 'Mi turno'": el encargado también tiene el flujo completo del bartender (abrir/cerrar turno, registrar, reporte) dentro de su vista, junto a las pestañas admin.
 S11. "La logica de la cortesia esta mal implementada. No es producto sino por venta" — la cortesía se decide al momento de cada venta (modo Venta/Cortesía en la pantalla de turno), no por el tipo de producto; el catálogo deja de tener el flag.
+S12. "El nombre no va a ser gestor de barra, como marca del sistema que se llame 'Naira's'" — la marca del sistema es Naira's (UI, título, README, diseño).
 
 ## Tasks
 
@@ -45,3 +46,5 @@ S11. "La logica de la cortesia esta mal implementada. No es producto sino por ve
 - L10. Usuario preguntó por las vistas de venta del encargado y eligió "Pestaña 'Mi turno'": EncargadoHome recibe profile y agrega la pestaña que monta BartenderShift (RLS ya lo permitía; el turno queda a nombre del encargado).
 - L11. Usuario: "La logica de la cortesia esta mal implementada. No es producto sino por venta" → migration 0004 (elimina products.is_invitation y los productos cortesía de ejemplo), modo Venta/Cortesía en la pantalla de turno, resumen del turno dividido en ventas y cortesías (− por tipo). sales.is_invitation (snapshot) queda como única fuente de clasificación.
 - L12. Revisión nativa del candidato cortesía-por-venta (base b303e3f): assess high (item 1, DDL con borrado); el consentimiento del review fue DECLINADO para este candidato (consent-declined, sin linaje). Queda sin revisión nativa; verificación del writer: 6/6 tests + build en verde. El usuario puede pedir una revisión explícita más adelante.
+- L13. Usuario: la visual es "un bodrio total"; pidió bottom bar, drawer de alta y bottom sheet de acciones. Diseño propuesto en design/gestor-barra-ui/ con 3 direcciones (01 táctil oscura, 02 comanda clara, 03 suizo plano); a la espera de elección para implementar.
+- L14. Usuario: "El nombre no va a ser gestor de barra, como marca del sistema que se llame 'Naira's'" → marca aplicada en artboards, header, login, título y README.

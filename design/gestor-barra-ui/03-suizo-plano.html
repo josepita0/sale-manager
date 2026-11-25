@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 · Suizo plano (alto contraste) — Gestor de Barra</title>
+<style>
+  :root{
+    --bg:#FFFFFF; --alt:#F2F2EF; --border:#151515; --hair:#D8D8D3;
+    --ink:#141414; --muted:#6B6B66; --accent:#146B4F; --danger:#B3362A; --page:#E9E9E4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--page);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:28px 32px 56px}
+  button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+  button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+  .dir-head h1{font-size:20px;font-weight:650}
+  .dir-head p{color:var(--muted);font-size:13px;margin-top:4px;max-width:72ch;line-height:1.5}
+  .frames{display:flex;gap:44px;margin-top:26px;align-items:flex-start;flex-wrap:wrap}
+  .cap{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:0 0 10px 4px}
+  .phone{width:390px;height:844px;background:var(--bg);border:2px solid var(--ink);border-radius:10px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 18px 44px rgba(20,20,20,.28)}
+  .app-head{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 12px;border-bottom:2px solid var(--ink)}
+  .brand{font-size:15px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}
+  .sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .avatar{width:38px;height:38px;border-radius:6px;border:1.5px solid var(--ink);font-size:12px;font-weight:750}
+  main{flex:1;overflow:hidden;padding:16px 18px 0}
+  .turno{border:1.5px solid var(--ink);border-radius:6px;padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-end}
+  .turno .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:650}
+  .turno .big{font-size:25px;font-weight:750;margin-top:4px}
+  .turno .cort{font-size:12px;font-weight:650;color:var(--accent);text-align:right}
+  .seg{display:flex;margin-top:14px;border:1.5px solid var(--ink);border-radius:6px;overflow:hidden}
+  .seg button{flex:1;padding:10px 0;font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .seg .on{background:var(--ink);color:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:14px}
+  .prod{border:1.5px solid var(--ink);border-radius:6px;height:68px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:0 6px;text-align:center;background:var(--bg)}
+  .prod:active{background:var(--alt)}
+  .prod b{font-size:12.5px;font-weight:650;line-height:1.15}
+  .prod span{font-size:11px;color:var(--muted)}
+  .resumen{margin-top:16px}
+  .resumen h2{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:650}
+  .row{display:flex;align-items:center;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--hair)}
+  .row b{font-size:13.5px;font-weight:650}
+  .row small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+  .row .cort-tag{color:var(--accent);font-weight:650}
+  .minus{width:36px;height:36px;border-radius:6px;border:1.5px solid var(--ink);font-size:17px}
+  .navbar{display:flex;border-top:2px solid var(--ink);background:var(--bg);padding:8px 10px 14px;gap:6px}
+  .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-radius:6px;font-size:10px;font-weight:750;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .tab svg{width:20px;height:20px}
+  .tab.on{background:var(--ink);color:#fff}
+  .backdrop{position:absolute;inset:0;background:rgba(20,20,20,.5)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-top:2px solid var(--ink);padding:12px 18px 26px;box-shadow:0 -12px 36px rgba(20,20,20,.3)}
+  .grab{width:36px;height:4px;border-radius:2px;background:var(--hair);margin:0 auto 14px}
+  .sheet h3{font-size:14px;font-weight:750;text-transform:uppercase;letter-spacing:.06em}
+  .sheet .who{font-size:12px;color:var(--muted);margin:2px 0 10px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border-top:1px solid var(--hair);font-size:13.5px;font-weight:650;text-align:left}
+  .opt svg{width:18px;height:18px;color:var(--muted)}
+  .opt.danger,.opt.danger svg{color:var(--danger)}
+  .opt small{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400}
+  .cancel{width:100%;margin-top:12px;padding:12px 0;border-radius:6px;border:1.5px solid var(--ink);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.08em}
+  .fabrow{display:flex;justify-content:flex-end;margin-top:14px}
+  .fab{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:750;font-size:12px;text-transform:uppercase;letter-spacing:.06em;padding:12px 16px;border-radius:6px}
+  .fab svg{width:15px;height:15px}
+  .drawer{position:absolute;top:0;right:0;bottom:0;width:300px;background:var(--bg);border-left:2px solid var(--ink);padding:22px 20px;box-shadow:-12px 0 36px rgba(20,20,20,.3);display:flex;flex-direction:column}
+  .drawer h3{font-size:14px;font-weight:750;text-transform:uppercase;letter-spacing:.06em}
+  .drawer .sub2{font-size:12px;color:var(--muted);margin:3px 0 18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:6px;font-weight:650}
+  .field input{width:100%;height:46px;background:var(--bg);border:1.5px solid var(--ink);border-radius:6px;padding:0 12px;font-size:15px}
+  .save{margin-top:auto;background:var(--accent);color:#fff;font-weight:750;text-transform:uppercase;letter-spacing:.06em;border-radius:6px;padding:14px 0;text-align:center;font-size:12.5px}
+  .note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:14px;border-top:1px solid var(--hair);padding-top:12px}
+  @media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+</head>
+<body>
+<div class="dir-head">
+  <h1>Dirección 03 — Suizo plano (alto contraste)</h1>
+  <p>Blanco, tinta negra y un único verde de acento; bordes marcados, esquinas casi rectas y números en monoespaciada. La pestaña activa de la bottom bar es un bloque negro sólido. Tradeoff: máxima densidad y claridad de datos; más fría y menos ambientada.</p>
+</div>
+<div class="frames">
+
+  <!-- Frame A: registro -->
+  <section class="shot" aria-label="Registro, bartender">
+    <p class="cap">Registro — bartender</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">Naira's</p><p class="sub">Turno abierto · 22:14</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="turno">
+          <div><p class="lbl">Recaudado en el turno</p><p class="big mono">$ 68.500</p></div>
+          <p class="cort">5 cortesías</p>
+        </div>
+        <div class="seg" role="group" aria-label="Modo de registro">
+          <button class="on" aria-pressed="true">Venta</button>
+          <button aria-pressed="false">Cortesía</button>
+        </div>
+        <div class="grid">
+          <button class="prod"><b>Cerveza</b><span class="mono">$ 3.500</span></button>
+          <button class="prod"><b>Fernet + Coca</b><span class="mono">$ 5.000</span></button>
+          <button class="prod"><b>Gin Tonic</b><span class="mono">$ 5.500</span></button>
+          <button class="prod"><b>Vodka + Sprite</b><span class="mono">$ 5.000</span></button>
+          <button class="prod"><b>Coca</b><span class="mono">$ 2.500</span></button>
+          <button class="prod"><b>Agua</b><span class="mono">$ 2.000</span></button>
+          <button class="prod"><b>Vino</b><span class="mono">$ 4.000</span></button>
+          <button class="prod"><b>Trago de autor</b><span class="mono">$ 6.000</span></button>
+        </div>
+        <div class="resumen">
+          <h2>En este turno</h2>
+          <div class="row"><div><b>Cerveza</b><small class="mono">× 8 · $ 28.000</small></div><button class="minus" aria-label="Descontar una Cerveza">−</button></div>
+          <div class="row"><div><b>Fernet + Coca</b><small class="mono">× 5 · $ 25.000</small></div><button class="minus" aria-label="Descontar un Fernet + Coca">−</button></div>
+          <div class="row"><div><b>Gin Tonic</b><small class="mono">× 3 · <span class="cort-tag">cortesía</span></small></div><button class="minus" aria-label="Descontar una cortesía de Gin Tonic">−</button></div>
+        </div>
+      </main>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Mi turno</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-2-2.5 2-2.5-2L7 21z"/><path d="M10 8h4M10 12h4"/></svg>Reporte</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Frame B: productos con bottom sheet -->
+  <section class="shot" aria-label="Productos, encargado, con bottom sheet abierto">
+    <p class="cap">Productos — encargado, acciones en bottom sheet</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">Productos</p><p class="sub">8 en el catálogo · 6 activos</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="fabrow"><button class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuevo producto</button></div>
+        <div class="resumen">
+          <div class="row"><div><b>Cerveza</b><small class="mono">$ 3.500</small></div><button class="minus" aria-label="Acciones de Cerveza">···</button></div>
+          <div class="row"><div><b>Fernet + Coca</b><small class="mono">$ 5.000</small></div><button class="minus" aria-label="Acciones de Fernet + Coca">···</button></div>
+          <div class="row"><div><b>Gin Tonic</b><small class="mono">$ 5.500</small></div><button class="minus" aria-label="Acciones de Gin Tonic">···</button></div>
+          <div class="row"><div><b>Coca</b><small class="mono">$ 2.500 · inactiva</small></div><button class="minus" aria-label="Acciones de Coca">···</button></div>
+          <div class="row"><div><b>Agua</b><small class="mono">$ 2.000</small></div><button class="minus" aria-label="Acciones de Agua">···</button></div>
+        </div>
+      </main>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Mi turno</button>
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>Productos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Turnos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.3 1 6.2-5.5-3-5.5 3 1-6.2L3 9.5l6.3-.9z"/></svg>VIP</button>
+      </nav>
+      <div class="backdrop"></div>
+      <div class="sheet" role="dialog" aria-label="Acciones de Gin Tonic">
+        <div class="grab"></div>
+        <h3>Gin Tonic</h3>
+        <p class="who mono">$ 5.500 · activo · con ventas registradas</p>
+        <button class="opt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg>Editar precio o nombre</button>
+        <button class="opt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>Desactivar<small>sale de la grilla</small></button>
+        <button class="opt danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V5h4v2M9 7l1 13h4l1-13"/></svg>Eliminar<small>bloqueado: tiene ventas</small></button>
+        <button class="cancel">Cancelar</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Frame C: drawer de alta -->
+  <section class="shot" aria-label="Productos, encargado, con drawer de nuevo producto">
+    <p class="cap">Productos — drawer de alta</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">Productos</p><p class="sub">8 en el catálogo · 6 activos</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="fabrow"><button class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuevo producto</button></div>
+        <div class="resumen">
+          <div class="row"><div><b>Cerveza</b><small class="mono">$ 3.500</small></div><button class="minus" aria-label="Acciones de Cerveza">···</button></div>
+          <div class="row"><div><b>Fernet + Coca</b><small class="mono">$ 5.000</small></div><button class="minus" aria-label="Acciones de Fernet + Coca">···</button></div>
+          <div class="row"><div><b>Gin Tonic</b><small class="mono">$ 5.500</small></div><button class="minus" aria-label="Acciones de Gin Tonic">···</button></div>
+        </div>
+      </main>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Mi turno</button>
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>Productos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Turnos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.3 1 6.2-5.5-3-5.5 3 1-6.2L3 9.5l6.3-.9z"/></svg>VIP</button>
+      </nav>
+      <div class="backdrop"></div>
+      <div class="drawer" role="dialog" aria-label="Nuevo producto">
+        <h3>Nuevo producto</h3>
+        <p class="sub2">Vender o regalar se decide en el turno, no acá.</p>
+        <div class="field"><label for="n3">Nombre</label><input id="n3" value="Campari + Soda"></div>
+        <div class="field"><label for="p3">Precio</label><input id="p3" class="mono" inputmode="decimal" value="5500"></div>
+        <button class="save">Guardar producto</button>
+        <p class="note">Se activa al guardar y aparece en la grilla del turno al instante.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

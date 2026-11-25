@@ -12,7 +12,7 @@ export function AppHeader({ profile, email, children }: Props) {
   return (
     <header className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 bg-neutral-900 px-4 py-3">
       <div className="flex items-center gap-2">
-        <span className="text-lg font-bold text-neutral-100">🍸 Gestor de Barra</span>
+        <span className="text-lg font-bold tracking-tight">Naira's</span>
         <span
           className={`rounded-full px-2 py-0.5 text-xs font-medium ${
             profile.role === 'encargado'
