@@ -36,6 +36,18 @@ export interface Sale {
   /** Snapshot taken at sale time; reports never read the product flag. */
   is_invitation: boolean
   vip_customer_id: string | null
+  /** Open account the sale was noted into; null for the loose comanda. */
+  account_id: string | null
+  created_at: string
+}
+
+/** An account opened inside a shift (free name or VIP customer). */
+export interface Account {
+  id: string
+  shift_id: string
+  name: string
+  vip_customer_id: string | null
+  status: 'open' | 'closed'
   created_at: string
 }
 

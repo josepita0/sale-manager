@@ -57,7 +57,7 @@ export default function App() {
   const header = <AppHeader profile={profile} email={email} />
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+    <div className="min-h-screen bg-papel text-tinta">
       {header}
       {profile.role === 'encargado' ? (
         <EncargadoHome profile={profile} />

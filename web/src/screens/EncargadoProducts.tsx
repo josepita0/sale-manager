@@ -1,6 +1,10 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { formatMoney } from '../lib/format'
+import { Drawer } from '../components/Drawer'
+import { Sheet } from '../components/Sheet'
+import { ScreenHead } from '../components/ScreenHead'
+import { LapizIcon, MasIcon, PausaIcon, TachoIcon } from '../components/icons'
 import type { Product } from '../lib/types'
 
 function ProductForm({
@@ -45,9 +49,12 @@ function ProductForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-      <div>
-        <label htmlFor="product-name" className="mb-1 block text-sm text-neutral-300">
+    <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
+      <div className="mb-3.5">
+        <label
+          htmlFor="product-name"
+          className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+        >
           Nombre
         </label>
         <input
@@ -55,11 +62,14 @@ function ProductForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 outline-none focus:border-emerald-500"
+          className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
         />
       </div>
-      <div>
-        <label htmlFor="product-price" className="mb-1 block text-sm text-neutral-300">
+      <div className="mb-3.5">
+        <label
+          htmlFor="product-price"
+          className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+        >
           Precio
         </label>
         <input
@@ -70,22 +80,20 @@ function ProductForm({
           inputMode="decimal"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 outline-none focus:border-emerald-500"
+          className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 font-mono text-[15px] tabular-nums text-tinta"
         />
       </div>
-      <p className="text-xs text-neutral-500">
-        Vender o regalar se decide al momento de la venta, con el modo Venta/Cortesía de la
-        pantalla de turno.
+      <button
+        type="submit"
+        disabled={busy}
+        className="mt-auto min-h-12 w-full rounded-lg bg-tinta py-3.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
+      >
+        Guardar producto
+      </button>
+      <p className="mt-3.5 border-t-2 border-dashed border-hair-fuerte pt-3 text-xs leading-[1.5] text-tinta-suave">
+        Se activa al guardar y aparece en la grilla del turno al instante. Vender o regalar se
+        decide en el turno, no acá.
       </p>
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={busy}
-          className="flex-1 rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
-        >
-          Guardar
-        </button>
-      </div>
     </form>
   )
 }
@@ -93,6 +101,7 @@ function ProductForm({
 export function ProductsTab() {
   const [products, setProducts] = useState<Product[] | null>(null)
   const [editing, setEditing] = useState<Product | 'new' | null>(null)
+  const [actionsFor, setActionsFor] = useState<Product | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
 
@@ -115,6 +124,7 @@ export function ProductsTab() {
     if (error) setError('No se pudo actualizar: ' + error.message)
     else await load()
     setBusy(false)
+    setActionsFor(null)
   }
 
   async function remove(p: Product) {
@@ -131,33 +141,78 @@ export function ProductsTab() {
       await load()
     }
     setBusy(false)
+    setActionsFor(null)
   }
 
+  const activeCount = (products ?? []).filter((p) => p.active).length
+  const total = products?.length ?? 0
+
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-          Catálogo
-        </h2>
-        {!editing && (
-          <button
-            onClick={() => setEditing('new')}
-            className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
-          >
-            + Agregar producto
-          </button>
-        )}
-      </div>
+    <main className="mx-auto max-w-3xl px-5 pt-4">
+      <ScreenHead
+        title="Productos"
+        subtitle={`${total} en el catálogo · ${activeCount} activos`}
+      />
 
       {error && (
-        <p className="mt-3 rounded-xl border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
 
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setEditing('new')}
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
+        >
+          <MasIcon className="h-4 w-4" />
+          Nuevo producto
+        </button>
+      </div>
+
+      <div className="mt-3.5">
+        {products === null ? (
+          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
+        ) : products.length === 0 ? (
+          <p className="py-3 text-sm text-tinta-suave">El catálogo está vacío.</p>
+        ) : (
+          products.map((p) => (
+            <div
+              key={p.id}
+              className="flex items-center justify-between gap-3 border-b border-dashed border-hair py-2.5"
+            >
+              <div>
+                <p className={`text-sm font-semibold ${p.active ? 'text-tinta' : 'text-tinta-suave'}`}>
+                  {p.name}
+                </p>
+                <p className="mt-0.5 font-mono text-xs tabular-nums text-tinta-suave">
+                  {formatMoney(p.price)}
+                  {!p.active && ' · Inactiva'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActionsFor(p)}
+                aria-label={`Acciones de ${p.name}`}
+                className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-tinta text-sm font-bold text-tinta before:absolute before:-inset-1 before:rounded-lg before:content-['']"
+              >
+                ···
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+
       {editing && (
-        <div className="mt-3">
+        <Drawer
+          title={editing === 'new' ? 'Nuevo producto' : `Editar ${editing.name}`}
+          heading={editing === 'new' ? 'Nuevo producto' : 'Editar producto'}
+          subtitle="Vender o regalar se decide en el turno, no acá."
+          onClose={() => setEditing(null)}
+        >
           <ProductForm
+            key={editing === 'new' ? 'new' : editing.id}
             initial={editing === 'new' ? null : editing}
             onDone={async () => {
               setEditing(null)
@@ -165,59 +220,62 @@ export function ProductsTab() {
             }}
             onError={setError}
           />
+        </Drawer>
+      )}
+
+      {actionsFor && (
+        <Sheet
+          title={`Acciones de ${actionsFor.name}`}
+          heading={actionsFor.name}
+          subtitle={
+            <span className="font-mono tabular-nums">
+              {formatMoney(actionsFor.price)} · {actionsFor.active ? 'activo' : 'inactivo'}
+            </span>
+          }
+          onClose={() => setActionsFor(null)}
+        >
           <button
-            onClick={() => setEditing(null)}
-            className="mt-2 text-sm text-neutral-400 hover:text-neutral-200"
+            type="button"
+            onClick={() => {
+              const product = actionsFor
+              setActionsFor(null)
+              setEditing(product)
+            }}
+            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta"
+          >
+            <LapizIcon className="h-[19px] w-[19px] text-tinta-suave" />
+            Editar precio o nombre
+          </button>
+          <button
+            type="button"
+            onClick={() => void toggleActive(actionsFor)}
+            disabled={busy}
+            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta disabled:opacity-40"
+          >
+            <PausaIcon className="h-[19px] w-[19px] text-tinta-suave" />
+            {actionsFor.active ? 'Desactivar' : 'Activar'}
+            <small className="ml-auto text-[11px] font-normal text-tinta-suave">
+              {actionsFor.active ? 'sale de la grilla' : 'vuelve a la grilla'}
+            </small>
+          </button>
+          <button
+            type="button"
+            onClick={() => void remove(actionsFor)}
+            disabled={busy}
+            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-rojo disabled:opacity-40"
+          >
+            <TachoIcon className="h-[19px] w-[19px]" />
+            Eliminar
+          </button>
+          <button
+            type="button"
+            onClick={() => setActionsFor(null)}
+            className="mt-3 min-h-12 w-full rounded-lg border-[1.5px] border-tinta text-[13px] font-semibold tracking-[0.05em] text-tinta uppercase"
           >
             Cancelar
           </button>
-        </div>
+        </Sheet>
       )}
-
-      <div className="mt-3 divide-y divide-neutral-800 rounded-2xl border border-neutral-800 bg-neutral-900">
-        {products === null ? (
-          <p className="p-4 text-sm text-neutral-500">Cargando…</p>
-        ) : products.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">El catálogo está vacío.</p>
-        ) : (
-          products.map((p) => (
-            <div key={p.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-              <div>
-                <p className={`font-medium ${p.active ? '' : 'text-neutral-500 line-through'}`}>
-                  {p.name}
-                </p>
-                <p className="text-xs text-neutral-500">
-                  {formatMoney(p.price)}
-                  {!p.active && ' · Inactiva'}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setEditing(p)}
-                  disabled={busy || editing !== null}
-                  className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 disabled:opacity-40"
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => void toggleActive(p)}
-                  disabled={busy}
-                  className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 disabled:opacity-40"
-                >
-                  {p.active ? 'Desactivar' : 'Activar'}
-                </button>
-                <button
-                  onClick={() => void remove(p)}
-                  disabled={busy}
-                  className="rounded-lg border border-red-900/60 px-3 py-1.5 text-sm text-red-300 hover:bg-red-950/40 disabled:opacity-40"
-                >
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
+    </main>
   )
 }

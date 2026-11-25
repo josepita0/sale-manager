@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
+import { SectionLabel } from '../components/ScreenHead'
 import type { ShiftWithDetails } from '../lib/types'
 
 interface Props {
@@ -33,55 +34,57 @@ export function ShiftReport({ shiftId }: Props) {
     }
   }, [shiftId])
 
-  if (loading) return <p className="p-6 text-neutral-400">Cargando reporte…</p>
-  if (error || !shift) return <p className="p-6 text-red-300">{error}</p>
+  if (loading) return <p className="px-1 py-6 text-sm text-tinta-suave">Cargando reporte…</p>
+  if (error || !shift) return <p className="px-1 py-6 text-sm text-rojo">{error}</p>
 
   const report = buildShiftReport(shift.sales)
   const bartenderName = shift.profiles?.full_name || 'Bartender'
 
   return (
     <div>
-      <div className="rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-        <p className="text-sm text-neutral-400">
+      <div className="rounded-[10px] border border-hair bg-carta px-4 py-3">
+        <p className="text-sm text-tinta">
           {bartenderName} · {formatDateTime(shift.started_at)}
           {shift.ended_at ? ` → ${formatDateTime(shift.ended_at)}` : ''}
         </p>
       </div>
 
-      <section className="mt-6 overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900">
-        <h3 className="border-b border-neutral-800 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
-          Ventas
-        </h3>
+      <section className="mt-5">
+        <SectionLabel>Ventas</SectionLabel>
         {report.sold.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">No se vendieron productos en este turno.</p>
+          <p className="py-3 text-sm text-tinta-suave">No se vendieron productos en este turno.</p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="mt-1 w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
-                <th className="px-4 py-2 font-medium">Producto</th>
-                <th className="px-2 py-2 text-right font-medium">Cant.</th>
-                <th className="px-2 py-2 text-right font-medium">Precio</th>
-                <th className="px-4 py-2 text-right font-medium">Subtotal</th>
+              <tr className="text-left text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase">
+                <th className="py-1.5 pr-2 font-semibold">Producto</th>
+                <th className="px-1.5 py-1.5 text-right font-semibold">Cant.</th>
+                <th className="px-1.5 py-1.5 text-right font-semibold">Precio</th>
+                <th className="py-1.5 pl-2 text-right font-semibold">Subtotal</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800">
+            <tbody>
               {report.sold.map((line) => (
-                <tr key={line.productId}>
-                  <td className="px-4 py-2.5 font-medium">{line.name}</td>
-                  <td className="px-2 py-2.5 text-right">× {line.quantity}</td>
-                  <td className="px-2 py-2.5 text-right text-neutral-400">
+                <tr key={line.productId} className="border-b border-dashed border-hair">
+                  <td className="py-2 pr-2 font-semibold text-tinta">{line.name}</td>
+                  <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta">
+                    × {line.quantity}
+                  </td>
+                  <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta-suave">
                     {formatMoney(line.unitPrice)}
                   </td>
-                  <td className="px-4 py-2.5 text-right">{formatMoney(line.subtotal)}</td>
+                  <td className="py-2 pl-2 text-right font-mono tabular-nums text-tinta">
+                    {formatMoney(line.subtotal)}
+                  </td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t border-neutral-800 bg-neutral-950/40">
-                <td className="px-4 py-3 font-semibold" colSpan={3}>
+              <tr className="border-t-2 border-solid border-tinta">
+                <td className="py-2.5 font-bold text-tinta" colSpan={3}>
                   Total recaudado
                 </td>
-                <td className="px-4 py-3 text-right font-semibold text-emerald-400">
+                <td className="py-2.5 text-right font-mono font-bold tabular-nums text-verde">
                   {formatMoney(report.soldTotal)}
                 </td>
               </tr>
@@ -90,35 +93,41 @@ export function ShiftReport({ shiftId }: Props) {
         )}
       </section>
 
-      <section className="mt-4 overflow-hidden rounded-2xl border border-amber-900/50 bg-neutral-900">
-        <h3 className="border-b border-amber-900/50 px-4 py-3 text-sm font-semibold uppercase tracking-wide text-amber-400/90">
-          Cortesías
-        </h3>
+      <section className="mt-5">
+        <SectionLabel>Cortesías</SectionLabel>
         {report.invitations.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">No se registraron cortesías en este turno.</p>
+          <p className="py-3 text-sm text-tinta-suave">No se registraron cortesías en este turno.</p>
         ) : (
-          <table className="w-full text-sm">
+          <table className="mt-1 w-full text-sm">
             <thead>
-              <tr className="text-left text-xs uppercase tracking-wide text-neutral-500">
-                <th className="px-4 py-2 font-medium">Producto</th>
-                <th className="px-4 py-2 text-right font-medium">Cant.</th>
+              <tr className="text-left text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase">
+                <th className="py-1.5 pr-2 font-semibold">Producto</th>
+                <th className="px-1.5 py-1.5 text-right font-semibold">Cant.</th>
+                <th className="py-1.5 pl-2 text-right font-semibold">Regalado</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800">
+            <tbody>
               {report.invitations.map((line) => (
-                <tr key={line.productId}>
-                  <td className="px-4 py-2.5 font-medium">{line.name}</td>
-                  <td className="px-4 py-2.5 text-right">× {line.quantity}</td>
+                <tr key={line.productId} className="border-b border-dashed border-hair">
+                  <td className="py-2 pr-2 font-semibold text-tinta">
+                    {line.name} <span className="text-[11px] font-semibold text-rojo">· cortesía</span>
+                  </td>
+                  <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta">
+                    × {line.quantity}
+                  </td>
+                  <td className="py-2 pl-2 text-right font-mono tabular-nums text-tinta-suave">
+                    {formatMoney(line.subtotal)}
+                  </td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
-              <tr className="border-t border-amber-900/50 bg-neutral-950/40">
-                <td className="px-4 py-3 font-semibold">
+              <tr className="border-t-2 border-solid border-tinta">
+                <td className="py-2.5 font-bold text-tinta" colSpan={2}>
                   Total cortesías ({report.invitationsCount})
                 </td>
-                <td className="px-4 py-3 text-right font-semibold text-amber-400">
-                  Regalado: {formatMoney(report.giftedValue)}
+                <td className="py-2.5 text-right font-mono font-bold tabular-nums text-rojo">
+                  {formatMoney(report.giftedValue)}
                 </td>
               </tr>
             </tfoot>

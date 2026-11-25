@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
+import { initials } from '../lib/format'
 import type { Profile } from '../lib/types'
 
 interface Props {
@@ -8,32 +9,36 @@ interface Props {
   children?: ReactNode
 }
 
+/**
+ * App header of direction 02: brand, role line and the round sign-out
+ * avatar, over a dashed hair-fuerte divider.
+ */
 export function AppHeader({ profile, email, children }: Props) {
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-800 bg-neutral-900 px-4 py-3">
-      <div className="flex items-center gap-2">
-        <span className="text-lg font-bold tracking-tight">Naira's</span>
-        <span
-          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-            profile.role === 'encargado'
-              ? 'bg-indigo-500/15 text-indigo-300'
-              : 'bg-emerald-500/15 text-emerald-300'
-          }`}
-        >
-          {profile.role === 'encargado' ? 'Encargado' : 'Bartender'}
-        </span>
-      </div>
-      <div className="flex items-center gap-3">
-        {children}
-        <span className="hidden text-sm text-neutral-400 sm:inline" title={email}>
-          {profile.full_name || email}
-        </span>
-        <button
-          onClick={() => void supabase.auth.signOut()}
-          className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm text-neutral-300 transition hover:bg-neutral-800"
-        >
-          Salir
-        </button>
+    <header className="border-b-2 border-dashed border-hair-fuerte bg-papel px-5 pt-4 pb-3">
+      <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
+        <div>
+          <p className="text-base font-extrabold tracking-[0.06em] text-tinta uppercase">
+            Naira's
+          </p>
+          <p className="mt-0.5 text-xs text-tinta-suave">
+            {profile.role === 'encargado' ? 'Encargado' : 'Bartender'}
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          {children}
+          <span className="hidden max-w-[14rem] truncate text-xs text-tinta-suave sm:inline" title={email}>
+            {profile.full_name || email}
+          </span>
+          <button
+            type="button"
+            onClick={() => void supabase.auth.signOut()}
+            aria-label="Cerrar sesión"
+            className="flex h-10 w-10 items-center justify-center rounded-full border-[1.5px] border-tinta text-xs font-bold text-tinta"
+          >
+            {initials(profile.full_name ?? '', email)}
+          </button>
+        </div>
       </div>
     </header>
   )
@@ -41,8 +46,10 @@ export function AppHeader({ profile, email, children }: Props) {
 
 export function Splash({ text, error }: { text: string; error?: boolean }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
-      <p className={`max-w-md text-center ${error ? 'text-red-300' : 'text-neutral-400'}`}>{text}</p>
+    <div className="flex min-h-screen items-center justify-center bg-papel px-4">
+      <p className={`max-w-md text-center text-sm ${error ? 'text-rojo' : 'text-tinta-suave'}`}>
+        {text}
+      </p>
     </div>
   )
 }

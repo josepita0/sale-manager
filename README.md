@@ -5,6 +5,8 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 ## Funcionalidades
 
 - Registro táctil de ventas y cortesías durante el turno (botón abrir/cerrar). La cortesía se decide por venta, con el modo Venta/Cortesía: cualquier producto puede regalarse.
+- La pantalla de turno es una grilla a pantalla completa con un **ticket flotante** (comanda): lo tocado queda pendiente, agrupado por producto, y se registra por lote limpiando la comanda.
+- **Cuentas abiertas:** desde la comanda se puede abrir una cuenta con nombre libre o cliente VIP; mientras está activa, los taps de la grilla se anotan en esa cuenta en paralelo a la comanda suelta. Cada cuenta se registra y cierra por separado.
 - Reporte al cerrar: cantidades por producto, subtotal, total recaudado y valor regalado en cortesías.
 - Clientes VIP (opcional): al registrar una cortesía se puede elegir a qué cliente VIP va destinada.
 - Vista de encargado: ABM de productos, clientes VIP, historial de todos los turnos y su propio turno (puede además atender la barra).
@@ -14,7 +16,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ## Setup de Supabase (una sola vez)
 
-1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0004): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
+1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0005): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
 2. **Usuarios:** **Authentication → Users → Add user → Create new user**. Cargá email + contraseña y marcá *Auto Confirm User*. Creá así la cuenta del bartender y la del encargado.
 3. **Promover al encargado:** en **SQL Editor** ejecutá (reemplazá el email):
 
@@ -70,6 +72,7 @@ La clave `publishable` que usa el frontend es pública por diseño: viaja en el 
 - `profiles` — usuario, nombre y rol (`bartender` / `encargado`); se crea sola al crear el usuario.
 - `products` — catálogo: nombre, precio, activo. Vender o regalar se decide por venta, no por producto.
 - `shifts` — turno: bartender, inicio, fin, estado. Un solo turno abierto por bartender (índice único parcial).
-- `sales` — cada venta/cortesía: turno, producto, cantidad, **precio al momento** (snapshot), fecha.
+- `sales` — cada venta/cortesía: turno, producto, cantidad, **precio al momento** (snapshot), fecha, y opcionalmente la cuenta (`account_id`) en la que se anotó.
+- `accounts` — cuentas abiertas dentro de un turno: nombre (libre o del cliente VIP), cliente VIP opcional, estado (`open` / `closed`) y fecha de apertura.
 
 La seguridad vive en la base: el bartender solo ve y toca su propio turno abierto; el encargado administra productos y ve todo el historial.

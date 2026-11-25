@@ -12,6 +12,7 @@ function makeSale(overrides: Partial<SaleWithProduct> & { product_id: string }):
     unit_price: 1000,
     is_invitation: false,
     vip_customer_id: null,
+    account_id: null,
     created_at: '2024-01-01T00:00:00Z',
     products: { name: 'Producto', price: 1000 },
     ...rest,

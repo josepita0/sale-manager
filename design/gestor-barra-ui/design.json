@@ -4,7 +4,7 @@
   "feature": "odd/tasks/gestor-ventas.md",
   "artboards": [
     { "file": "01-tactil-oscura.html", "title": "Táctil de barra (oscuro)", "tradeoff": "Cómoda para luz baja y uso nocturno; menos legible a pleno sol", "width": 1290, "height": 940 },
-    { "file": "02-comanda-clara.html", "title": "Comanda de papel (claro)", "tradeoff": "Máxima legibilidad diurna y carácter de ticket; menos ambiente nocturno", "width": 1290, "height": 940 },
+    { "file": "02-comanda-clara.html", "title": "Comanda de papel (claro) · ticket flotante + cuentas", "tradeoff": "Ticket flotante, cuentas abiertas en paralelo con nombre o VIP, reporte aparte; menos ambiente nocturno", "width": 3160, "height": 940 },
     { "file": "03-suizo-plano.html", "title": "Suizo plano (alto contraste)", "tradeoff": "Máxima densidad y claridad de datos; más fría y menos ambientada", "width": 1290, "height": 940 }
   ]
 }

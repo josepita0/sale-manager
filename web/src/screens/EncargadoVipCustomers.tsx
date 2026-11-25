@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { ScreenHead } from '../components/ScreenHead'
 import type { VipCustomer } from '../lib/types'
 
 function VipForm({
@@ -37,9 +38,12 @@ function VipForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-neutral-800 bg-neutral-900 p-4">
-      <div>
-        <label htmlFor="vip-name" className="mb-1 block text-sm text-neutral-300">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-hair bg-carta p-4">
+      <div className="mb-3.5">
+        <label
+          htmlFor="vip-name"
+          className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+        >
           Nombre
         </label>
         <input
@@ -47,13 +51,13 @@ function VipForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 outline-none focus:border-emerald-500"
+          className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
         />
       </div>
       <button
         type="submit"
         disabled={busy}
-        className="w-full rounded-xl bg-emerald-600 px-4 py-2.5 font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+        className="min-h-12 w-full rounded-lg bg-tinta px-4 py-2.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
       >
         Guardar
       </button>
@@ -97,35 +101,41 @@ export function VipCustomersTab() {
     setBusy(false)
   }
 
+  const activeCount = (customers ?? []).filter((c) => c.active).length
+
   return (
-    <div>
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-          Clientes VIP
-        </h2>
-        {!editing && (
-          <button
-            onClick={() => setEditing('new')}
-            className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
-          >
-            + Agregar cliente
-          </button>
-        )}
-      </div>
-      <p className="mt-1 text-xs text-neutral-500">
+    <main className="mx-auto max-w-3xl px-5 pt-4">
+      <ScreenHead
+        title="Clientes VIP"
+        subtitle={`${customers?.length ?? 0} cargados · ${activeCount} activos`}
+      />
+      <p className="mb-3 text-xs leading-[1.5] text-tinta-suave">
         Al registrar una cortesía, el bartender puede elegir a cuál de estos clientes va destinada
         (opcional).
       </p>
 
       {error && (
-        <p className="mt-3 rounded-xl border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
 
+      <div className="mb-3 flex justify-end">
+        {!editing && (
+          <button
+            type="button"
+            onClick={() => setEditing('new')}
+            className="min-h-11 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
+          >
+            + Nuevo cliente
+          </button>
+        )}
+      </div>
+
       {editing && (
-        <div className="mt-3">
+        <div className="mb-3">
           <VipForm
+            key={editing === 'new' ? 'new' : editing.id}
             initial={editing === 'new' ? null : editing}
             onDone={async () => {
               setEditing(null)
@@ -134,45 +144,52 @@ export function VipCustomersTab() {
             onError={setError}
           />
           <button
+            type="button"
             onClick={() => setEditing(null)}
-            className="mt-2 text-sm text-neutral-400 hover:text-neutral-200"
+            className="mt-2 min-h-11 text-sm text-tinta-suave underline-offset-2 hover:underline"
           >
             Cancelar
           </button>
         </div>
       )}
 
-      <div className="mt-3 divide-y divide-neutral-800 rounded-2xl border border-neutral-800 bg-neutral-900">
+      <div>
         {customers === null ? (
-          <p className="p-4 text-sm text-neutral-500">Cargando…</p>
+          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
         ) : customers.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">Todavía no hay clientes VIP cargados.</p>
+          <p className="py-3 text-sm text-tinta-suave">Todavía no hay clientes VIP cargados.</p>
         ) : (
           customers.map((c) => (
-            <div key={c.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-              <p className={`font-medium ${c.active ? '' : 'text-neutral-500 line-through'}`}>
+            <div
+              key={c.id}
+              className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-hair py-2.5"
+            >
+              <p className={`text-sm font-semibold ${c.active ? 'text-tinta' : 'text-tinta-suave'}`}>
                 {c.name}
-                {!c.active && <span className="ml-2 text-xs normal-case">Inactivo</span>}
+                {!c.active && <span className="ml-2 text-xs font-normal">Inactivo</span>}
               </p>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => setEditing(c)}
                   disabled={busy || editing !== null}
-                  className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 disabled:opacity-40"
+                  className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
                 >
                   Editar
                 </button>
                 <button
+                  type="button"
                   onClick={() => void toggleActive(c)}
                   disabled={busy}
-                  className="rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800 disabled:opacity-40"
+                  className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
                 >
                   {c.active ? 'Desactivar' : 'Activar'}
                 </button>
                 <button
+                  type="button"
                   onClick={() => void remove(c)}
                   disabled={busy}
-                  className="rounded-lg border border-red-900/60 px-3 py-1.5 text-sm text-red-300 hover:bg-red-950/40 disabled:opacity-40"
+                  className="min-h-11 rounded-lg border border-rojo/50 px-3 text-xs font-semibold text-rojo disabled:opacity-40"
                 >
                   Eliminar
                 </button>
@@ -181,6 +198,6 @@ export function VipCustomersTab() {
           ))
         )}
       </div>
-    </div>
+    </main>
   )
 }

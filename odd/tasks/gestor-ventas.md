@@ -16,6 +16,8 @@ S9. "me gustaria que opcionalmente puedas agregar un apartado de 'clientes vip' 
 S10. Usuario eligió "Pestaña 'Mi turno'": el encargado también tiene el flujo completo del bartender (abrir/cerrar turno, registrar, reporte) dentro de su vista, junto a las pestañas admin.
 S11. "La logica de la cortesia esta mal implementada. No es producto sino por venta" — la cortesía se decide al momento de cada venta (modo Venta/Cortesía en la pantalla de turno), no por el tipo de producto; el catálogo deja de tener el flag.
 S12. "El nombre no va a ser gestor de barra, como marca del sistema que se llame 'Naira's'" — la marca del sistema es Naira's (UI, título, README, diseño).
+S13. Usuario eligió la dirección visual 02 (Comanda de papel): tema claro papel/tinta, bottom bar de navegación, alta en drawer, acciones de ítem en bottom sheet (···).
+S14. "que la opcion de ticket sea una opcion flotante... una especie de 'ticket' y que luego cuando se registre se limpie... no tengamos que hacer tanto scroll" + "Abrir cuenta... se mantendra abierta una cuenta y podras seguir registrando otros productos en paralelo, debera poderse registrar un nombre o seleccionar un cliente vio": FAB de ticket sobre la grilla, comanda pendiente que se registra por lote y se limpia, cuentas abiertas en paralelo (nombre libre o cliente VIP) registrables una por una — con soporte en BD (tabla accounts + sales.account_id).
 
 ## Tasks
 
@@ -31,6 +33,9 @@ S12. "El nombre no va a ser gestor de barra, como marca del sistema que se llame
 - T10 (S1-S9) revisión nativa del nuevo candidato y push a origin
 - T11 (S10) pestaña "Mi turno" del encargado reutilizando BartenderShift
 - T12 (S11) cortesía por venta: modo Venta/Cortesía, sin flag de producto — migration 0004
+- T13 (S14) migración accounts + sales.account_id — supabase/migrations/0005_accounts.sql
+- T14 (S13,S14) rediseño dirección 02: tema claro, bottom bar, FAB ticket, comanda pendiente por lote, cuentas abiertas — web/src
+- T15 (S1-S14) verificación, revisión nativa y push
 
 ## Log
 
@@ -48,3 +53,6 @@ S12. "El nombre no va a ser gestor de barra, como marca del sistema que se llame
 - L12. Revisión nativa del candidato cortesía-por-venta (base b303e3f): assess high (item 1, DDL con borrado); el consentimiento del review fue DECLINADO para este candidato (consent-declined, sin linaje). Queda sin revisión nativa; verificación del writer: 6/6 tests + build en verde. El usuario puede pedir una revisión explícita más adelante.
 - L13. Usuario: la visual es "un bodrio total"; pidió bottom bar, drawer de alta y bottom sheet de acciones. Diseño propuesto en design/gestor-barra-ui/ con 3 direcciones (01 táctil oscura, 02 comanda clara, 03 suizo plano); a la espera de elección para implementar.
 - L14. Usuario: "El nombre no va a ser gestor de barra, como marca del sistema que se llame 'Naira's'" → marca aplicada en artboards, header, login, título y README.
+- L15. Usuario: "el historial de lo vendido se note aparte, que al momento de ir cargando se marque como en una especie de ticket y que luego cuando se registre se limpie... no tengamos que hacer tanto scroll" y "por ahora va ganando la opcion 2" → artboard 02 rehecho con flujo de comanda: Turno (grilla llena) · Ticket (pendientes, se registra y limpia) · Reporte (registrados con −); bottom bar de 3 pestañas para el bartender.
+- L16. Usuario: "que la opcion de ticket sea una opcion flotante en la misma vista de turno, un floating button en la parte inferior. Quiero que agregues una opcion dentro del ticket que se aperturo que diga 'Abrir cuenta', cuando eso se seleccione se mantendra abierta una cuenta y podras seguir registrando otros productos en paralelo, debera poderse registrar un nombre o seleccionar un cliente vio" → artboard 02: FAB de ticket con badge sobre la grilla, bottom bar vuelve a Turno/Reporte; comanda con sección “Cuentas abiertas”, “+ Abrir cuenta” (nombre libre o VIP) y detalle de cuenta (registrar / seguir anotando, chip de cuenta activa en la grilla).
+- L17. Usuario: "Bello, nos vamos con la segunda direccion. Toma en cuenta lo que comente tambien para hacer ajustes en backend y base de datos" → se implementa la dirección 02 completa con soporte de BD para cuentas (migration 0005 + accounts/sales.account_id) y rediseño frontend delegado a worker con la artboard como spec visual.

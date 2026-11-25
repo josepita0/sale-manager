@@ -1,5 +1,5 @@
 const numberFormat = new Intl.NumberFormat('es-AR', {
-  minimumFractionDigits: 2,
+  minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 })
 
@@ -14,4 +14,20 @@ export function formatDateTime(iso: string): string {
     hour: '2-digit',
     minute: '2-digit',
   })
+}
+
+/** HH:MM, used by the comanda ("abierta 21:47"). */
+export function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+export function initials(name: string, email: string): string {
+  const source = name.trim() || email.trim()
+  if (!source) return '·'
+  const words = source.split(/\s+/).filter(Boolean)
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase()
+  return source.slice(0, 2).toUpperCase()
 }

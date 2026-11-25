@@ -17,14 +17,19 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-neutral-800 bg-neutral-900 p-6">
-        <h1 className="text-center text-3xl font-bold tracking-tight text-neutral-100">Naira's</h1>
-        <p className="mt-1 text-center text-sm text-neutral-400">Ventas y cortesías de tu turno</p>
+    <div className="flex min-h-screen items-center justify-center bg-papel px-4">
+      <div className="w-full max-w-sm rounded-lg border border-hair bg-carta p-6 shadow-[0_6px_18px_rgba(60,45,20,0.10)]">
+        <h1 className="text-center text-3xl font-extrabold tracking-[0.06em] text-tinta uppercase">
+          Naira's
+        </h1>
+        <p className="mt-1 text-center text-sm text-tinta-suave">Ventas y cortesías de tu turno</p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm text-neutral-300">
+            <label
+              htmlFor="email"
+              className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+            >
               Email
             </label>
             <input
@@ -34,11 +39,14 @@ export function Login() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 text-neutral-100 outline-none focus:border-emerald-500"
+              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
             />
           </div>
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm text-neutral-300">
+            <label
+              htmlFor="password"
+              className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+            >
               Contraseña
             </label>
             <input
@@ -48,12 +56,12 @@ export function Login() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-neutral-700 bg-neutral-800 px-3 py-2.5 text-neutral-100 outline-none focus:border-emerald-500"
+              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
             />
           </div>
 
           {error && (
-            <p className="rounded-xl border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+            <p className="rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
               {error}
             </p>
           )}
@@ -61,7 +69,7 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+            className="min-h-12 w-full rounded-lg bg-tinta px-4 py-3 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
           >
             {loading ? 'Ingresando…' : 'Iniciar sesión'}
           </button>

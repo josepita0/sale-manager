@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
+import { ScreenHead } from '../components/ScreenHead'
 import { ShiftReport } from './ShiftReport'
 import type { ShiftWithDetails } from '../lib/types'
 
@@ -29,52 +30,52 @@ export function HistoryTab() {
 
   if (selectedId) {
     return (
-      <div>
+      <main className="mx-auto max-w-3xl px-5 pt-4">
         <button
+          type="button"
           onClick={() => setSelectedId(null)}
-          className="mb-3 rounded-lg border border-neutral-700 px-3 py-1.5 text-sm hover:bg-neutral-800"
+          className="mb-3 min-h-11 rounded-lg border-[1.5px] border-tinta px-3.5 text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
         >
           ← Volver al historial
         </button>
         <ShiftReport shiftId={selectedId} />
-      </div>
+      </main>
     )
   }
 
   return (
-    <div>
-      <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">
-        Últimos 50 turnos cerrados
-      </h2>
+    <main className="mx-auto max-w-3xl px-5 pt-4">
+      <ScreenHead title="Turnos" subtitle="Últimos 50 turnos cerrados" />
       {error && (
-        <p className="mt-3 rounded-xl border border-red-900/60 bg-red-950/40 px-3 py-2 text-sm text-red-300">
+        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
-      <div className="mt-2 divide-y divide-neutral-800 rounded-2xl border border-neutral-800 bg-neutral-900">
+      <div className="mt-1">
         {shifts === null ? (
-          <p className="p-4 text-sm text-neutral-500">Cargando…</p>
+          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
         ) : shifts.length === 0 ? (
-          <p className="p-4 text-sm text-neutral-500">Todavía no hay turnos cerrados.</p>
+          <p className="py-3 text-sm text-tinta-suave">Todavía no hay turnos cerrados.</p>
         ) : (
           shifts.map((shift) => {
             const report = buildShiftReport(shift.sales)
             return (
               <button
                 key={shift.id}
+                type="button"
                 onClick={() => setSelectedId(shift.id)}
-                className="flex w-full flex-wrap items-center justify-between gap-2 px-4 py-3 text-left hover:bg-neutral-800/50"
+                className="flex w-full items-center justify-between gap-3 border-b border-dashed border-hair py-3 text-left"
               >
-                <div>
-                  <p className="font-medium">
-                    {formatDateTime(shift.started_at)} ·{' '}
-                    {shift.profiles?.full_name || 'Bartender'}
-                  </p>
-                  <p className="text-xs text-neutral-500">
-                    Cortesías: {report.invitationsCount}
-                  </p>
-                </div>
-                <span className="font-semibold text-emerald-400">
+                <span>
+                  <span className="block text-sm font-semibold text-tinta">
+                    {formatDateTime(shift.started_at)} · {shift.profiles?.full_name || 'Bartender'}
+                  </span>
+                  <span className="mt-0.5 block font-mono text-xs tabular-nums text-tinta-suave">
+                    {report.invitationsCount} cortesías ·{' '}
+                    {report.sold.reduce((acc, line) => acc + line.quantity, 0)} ventas
+                  </span>
+                </span>
+                <span className="font-mono text-sm font-semibold tabular-nums text-verde">
                   {formatMoney(report.soldTotal)}
                 </span>
               </button>
@@ -82,6 +83,6 @@ export function HistoryTab() {
           })
         )}
       </div>
-    </div>
+    </main>
   )
 }
