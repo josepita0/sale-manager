@@ -1,10 +1,12 @@
-const numberFormat = new Intl.NumberFormat('es-AR', {
+const currencyFormat = new Intl.NumberFormat('es-ES', {
+  style: 'currency',
+  currency: 'EUR',
   minimumFractionDigits: 0,
   maximumFractionDigits: 2,
 })
 
 export function formatMoney(value: number): string {
-  return `$ ${numberFormat.format(value)}`
+  return currencyFormat.format(value)
 }
 
 export function formatDateTime(iso: string): string {
