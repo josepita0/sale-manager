@@ -60,7 +60,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-papel text-tinta">
       {header}
-      {profile.role === 'encargado' ? (
+      {profile.role !== 'bartender' ? (
         <EncargadoHome profile={profile} />
       ) : (
         <BartenderShift profile={profile} />

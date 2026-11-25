@@ -16,17 +16,17 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ## Setup de Supabase (una sola vez)
 
-1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0005): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
+1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0006): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
 2. **Usuarios:** **Authentication → Users → Add user → Create new user**. Cargá email + contraseña y marcá *Auto Confirm User*. Creá así la cuenta del bartender y la del encargado.
 3. **Promover al encargado:** en **SQL Editor** ejecutá (reemplazá el email):
 
    ```sql
    update public.profiles
-   set role = 'encargado'
+   set role = 'manager' -- o 'admin' (permisología propia a definir)
    where id = (select id from auth.users where email = 'encargado@tu-bar.com');
    ```
 
-   Toda cuenta nueva arranca como `bartender`; el rol de encargado nunca sale del registro público.
+   Toda cuenta nueva arranca como `bartender`; el rol de encargado nunca sale del registro público. Los roles son un enum de la base: `admin`, `manager`, `bartender`.
 4. **Cerrar el registro público (recomendado):** **Authentication → Sign In / Providers → Email** → desactivá **Allow new users to sign up**. Las cuentas se crean solo desde el dashboard.
 
 ## Frontend
@@ -69,7 +69,7 @@ La clave `publishable` que usa el frontend es pública por diseño: viaja en el 
 
 ## Modelo de datos
 
-- `profiles` — usuario, nombre y rol (`bartender` / `encargado`); se crea sola al crear el usuario.
+- `profiles` — usuario, nombre y rol (`admin` / `manager` / `bartender`, enum de la base); se crea sola al crear el usuario.
 - `products` — catálogo: nombre, precio, activo. Vender o regalar se decide por venta, no por producto.
 - `shifts` — turno: bartender, inicio, fin, estado. Un solo turno abierto por bartender (índice único parcial).
 - `sales` — cada venta/cortesía: turno, producto, cantidad, **precio al momento** (snapshot), fecha, y opcionalmente la cuenta (`account_id`) en la que se anotó.

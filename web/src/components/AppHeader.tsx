@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import { initials } from '../lib/format'
 import { Sheet } from './Sheet'
-import type { Profile } from '../lib/types'
+import { ROLE_LABEL, type Profile } from '../lib/types'
 
 interface Props {
   profile: Profile
@@ -34,7 +34,7 @@ export function AppHeader({ profile, email, children }: Props) {
             Naira's
           </p>
           <p className="mt-0.5 text-xs text-tinta-suave">
-            {profile.role === 'encargado' ? 'Encargado' : 'Bartender'}
+            {ROLE_LABEL[profile.role]}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -63,9 +63,7 @@ export function AppHeader({ profile, email, children }: Props) {
       >
         <div className="mb-4 flex items-center justify-between border-b border-dashed border-hair py-2.5 text-sm">
           <span className="text-tinta-suave">Rol</span>
-          <span className="font-semibold text-tinta">
-            {profile.role === 'encargado' ? 'Encargado' : 'Bartender'}
-          </span>
+          <span className="font-semibold text-tinta">{ROLE_LABEL[profile.role]}</span>
         </div>
         <button
           type="button"
