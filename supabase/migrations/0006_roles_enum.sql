@@ -6,11 +6,14 @@
 -- authorizations as manager (is_encargado covers both).
 -- ============================================================
 
+begin;
+
 create type public.user_role as enum ('admin', 'manager', 'bartender');
 
 alter table public.profiles drop constraint profiles_role_check;
 
 alter table public.profiles
+  alter column role drop default,
   alter column role type public.user_role
   using case role
     when 'encargado' then 'manager'::public.user_role
@@ -46,3 +49,5 @@ as $$
     where id = auth.uid() and role = 'admin'
   )
 $$;
+
+commit;
