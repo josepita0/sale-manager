@@ -21,10 +21,12 @@ export function EncargadoHome({ profile }: { profile: Profile }) {
 
   return (
     <div className="pb-28">
-      {tab === 'turno' && <BartenderShift profile={profile} embedded />}
-      {tab === 'productos' && <ProductsTab />}
-      {tab === 'turnos' && <HistoryTab />}
-      {tab === 'clientes' && <VipCustomersTab />}
+      <div key={tab} className="anim-panel-in">
+        {tab === 'turno' && <BartenderShift profile={profile} embedded />}
+        {tab === 'productos' && <ProductsTab />}
+        {tab === 'turnos' && <HistoryTab />}
+        {tab === 'clientes' && <VipCustomersTab />}
+      </div>
       <BottomBar items={ITEMS} active={tab} onSelect={(key) => setTab(key as Tab)} />
     </div>
   )

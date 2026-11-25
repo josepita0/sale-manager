@@ -18,7 +18,7 @@ export function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-papel px-4">
-      <div className="w-full max-w-sm rounded-lg border border-hair bg-carta p-6 shadow-[0_6px_18px_rgba(60,45,20,0.10)]">
+      <div className="anim-pop-in w-full max-w-sm rounded-lg border border-hair bg-carta p-6 shadow-[0_6px_18px_rgba(60,45,20,0.10)]">
         <h1 className="text-center text-3xl font-extrabold tracking-[0.06em] text-tinta uppercase">
           Naira's
         </h1>

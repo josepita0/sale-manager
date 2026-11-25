@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
 import { SectionLabel } from '../components/ScreenHead'
+import { ReportHeaderSkeleton } from './skeleton'
 import type { ShiftWithDetails } from '../lib/types'
 
 interface Props {
@@ -34,7 +35,7 @@ export function ShiftReport({ shiftId }: Props) {
     }
   }, [shiftId])
 
-  if (loading) return <p className="px-1 py-6 text-sm text-tinta-suave">Cargando reporte…</p>
+  if (loading) return <ReportHeaderSkeleton />
   if (error || !shift) return <p className="px-1 py-6 text-sm text-rojo">{error}</p>
 
   const report = buildShiftReport(shift.sales)

@@ -4,6 +4,7 @@ import { buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
 import { ScreenHead } from '../components/ScreenHead'
 import { ShiftReport } from './ShiftReport'
+import { ListRowsSkeleton } from './skeleton'
 import type { ShiftWithDetails } from '../lib/types'
 
 export function HistoryTab() {
@@ -47,13 +48,13 @@ export function HistoryTab() {
     <main className="mx-auto max-w-3xl px-5 pt-4">
       <ScreenHead title="Turnos" subtitle="Últimos 50 turnos cerrados" />
       {error && (
-        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
+        <p className="anim-slide-down mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
       <div className="mt-1">
         {shifts === null ? (
-          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
+          <ListRowsSkeleton label="Cargando turnos" rows={5} />
         ) : shifts.length === 0 ? (
           <p className="py-3 text-sm text-tinta-suave">Todavía no hay turnos cerrados.</p>
         ) : (

@@ -18,8 +18,10 @@ import { formatDateTime, formatMoney, formatTime } from '../lib/format'
 import { BottomBar } from '../components/BottomBar'
 import { SectionLabel } from '../components/ScreenHead'
 import { Sheet } from '../components/Sheet'
+import { toast } from '../components/Toast'
 import { BarrasIcon, CopaIcon, MasIcon, TicketIcon } from '../components/icons'
 import { ShiftReport } from './ShiftReport'
+import { ShiftSkeleton } from './skeleton'
 import type { Account, Product, Profile, Sale, SaleWithProduct, Shift, VipCustomer } from '../lib/types'
 
 interface Props {
@@ -42,7 +44,7 @@ function safeStorage(): Storage | null {
 
 function ErrorBanner({ message }: { message: string }) {
   return (
-    <p className="mb-4 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
+    <p className="anim-slide-down mb-4 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
       {message}
     </p>
   )
@@ -70,7 +72,7 @@ function TotalsStrip({ collected, invitations, sales }: { collected: number; inv
 
 function TicketRow({ line, onRemove }: { line: TicketLine; onRemove?: () => void }) {
   return (
-    <div className="flex items-baseline gap-2 border-b border-dashed border-hair py-2">
+    <div className="anim-line-in flex items-baseline gap-2 border-b border-dashed border-hair py-2">
       <span className="text-[13.5px] font-semibold text-tinta">
         {line.name}{' '}
         <span className="font-normal text-tinta-suave">× {line.qty}</span>
@@ -278,6 +280,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
     if (!ok) return
     commitLines(lines.filter((line) => line.accountId !== null))
     setSheet(null)
+    toast('Comanda registrada ✓')
   }
 
   async function registerAccount(account: Account) {
@@ -303,6 +306,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
     commitLines(lines.filter((line) => line.accountId !== account.id))
     setBusy(false)
     setSheet(null)
+    toast('Cuenta registrada ✓')
   }
 
   async function removeOne(productId: string, isInvitation: boolean) {
@@ -383,6 +387,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
     setConfirmingClose(false)
     setSheet(null)
     setBusy(false)
+    toast('Turno cerrado ✓')
   }
 
   const productById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products])
@@ -407,7 +412,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
   const loose = looseLines(lines)
   const pending = pendingCount(lines)
 
-  if (loading) return <p className="px-5 py-6 text-sm text-tinta-suave">Cargando…</p>
+  if (loading) return <ShiftSkeleton embedded={embedded} />
 
   const errorBanner = error ? <ErrorBanner message={error} /> : null
 
@@ -495,7 +500,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
         sales={salesCount}
       />
       {activeAccount && (
-        <div className="mt-3 inline-flex items-center gap-2 rounded-full border-[1.5px] border-rojo bg-carta py-1.5 pr-1.5 pl-3.5 text-[12.5px] font-semibold text-tinta">
+        <div className="anim-pop-in mt-3 inline-flex items-center gap-2 rounded-full border-[1.5px] border-rojo bg-carta py-1.5 pr-1.5 pl-3.5 text-[12.5px] font-semibold text-tinta">
           <span>
             Anotando en la cuenta: <em className="text-rojo not-italic">{activeAccount.name}</em>
           </span>
@@ -650,7 +655,9 @@ export function BartenderShift({ profile, embedded = false }: Props) {
         </div>
       )}
 
-      {tab === 'turno' ? turnoView : reporteView}
+      <div key={tab} className="anim-panel-in">
+        {tab === 'turno' ? turnoView : reporteView}
+      </div>
 
       {tab === 'turno' && (
         <button
@@ -659,7 +666,10 @@ export function BartenderShift({ profile, embedded = false }: Props) {
           aria-label={`Abrir comanda, ${pending} ${pending === 1 ? 'ítem pendiente' : 'ítems pendientes'}`}
           className="fixed right-[18px] bottom-[92px] z-20 flex h-[62px] w-[62px] flex-col items-center justify-center rounded-full bg-rojo text-white shadow-[0_10px_24px_rgba(60,45,20,0.38)]"
         >
-          <span className="absolute -top-1.5 -right-0.5 rounded-full bg-tinta px-1.5 py-0.5 font-mono text-[11px] font-bold tabular-nums text-white">
+          <span
+            key={pending}
+            className="anim-badge-pop absolute -top-1.5 -right-0.5 rounded-full bg-tinta px-1.5 py-0.5 font-mono text-[11px] font-bold tabular-nums text-white"
+          >
             {pending}
           </span>
           <TicketIcon className="h-6 w-6" />
@@ -678,303 +688,326 @@ export function BartenderShift({ profile, embedded = false }: Props) {
         />
       )}
 
-      {sheet?.type === 'comanda' && (
-        <Sheet
-          title="Comanda y cuentas abiertas"
-          heading="Comanda del turno"
-          subtitle={
-            loose.length === 0
-              ? 'Comanda vacía — tocá un producto para anotarla'
-              : `${pendingCount(loose)} ${pendingCount(loose) === 1 ? 'ítem suelto' : 'ítems sueltos'}`
-          }
-          onClose={() => setSheet(null)}
-        >
-          {loose.map((line) => (
-            <TicketRow key={line.key} line={line} onRemove={() => removePendingLine(line)} />
-          ))}
+      <Sheet
+        open={sheet?.type === 'comanda'}
+        title="Comanda y cuentas abiertas"
+        heading="Comanda del turno"
+        subtitle={
+          loose.length === 0
+            ? 'Comanda vacía — tocá un producto para anotarla'
+            : `${pendingCount(loose)} ${pendingCount(loose) === 1 ? 'ítem suelto' : 'ítems sueltos'}`
+        }
+        onClose={() =>
+          setSheet((current) => (current?.type === 'comanda' ? null : current))
+        }
+      >
+        {loose.map((line) => (
+          <TicketRow key={line.key} line={line} onRemove={() => removePendingLine(line)} />
+        ))}
 
-          {loose.length > 0 && (
-            <div className="flex justify-between pt-2.5 text-sm font-bold text-tinta">
-              <span>Pendiente</span>
-              <span className="font-mono tabular-nums">{formatMoney(linesTotal(loose))}</span>
-            </div>
-          )}
-
-          <div className="mt-3.5 flex gap-2">
-            <button
-              type="button"
-              onClick={() => commitLines(lines.filter((line) => line.accountId !== null))}
-              disabled={loose.length === 0 || busy}
-              className="min-h-12 rounded-lg border-[1.5px] border-tinta px-4 text-xs font-semibold tracking-[0.05em] text-tinta uppercase disabled:opacity-40"
-            >
-              Vaciar
-            </button>
-            <button
-              type="button"
-              onClick={() => void registerComanda()}
-              disabled={loose.length === 0 || busy}
-              className="min-h-12 flex-1 rounded-lg bg-tinta px-4 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-40"
-            >
-              Registrar comanda
-            </button>
+        {loose.length > 0 && (
+          <div className="flex justify-between pt-2.5 text-sm font-bold text-tinta">
+            <span>Pendiente</span>
+            <span className="font-mono tabular-nums">{formatMoney(linesTotal(loose))}</span>
           </div>
+        )}
 
-          <p className="mt-3.5 border-b-2 border-dashed border-hair-fuerte pb-1.5 text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase">
-            Cuentas abiertas
-          </p>
-
-          {accounts.length === 0 && (
-            <p className="py-3 text-sm text-tinta-suave">No hay cuentas abiertas en este turno.</p>
-          )}
-
-          {accounts.map((account) => {
-            const accountLines = linesForAccount(lines, account.id)
-            const vip = vipCustomers.find((v) => v.id === account.vip_customer_id)
-            return (
-              <button
-                key={account.id}
-                type="button"
-                onClick={() => setSheet({ type: 'account', accountId: account.id })}
-                className="flex w-full items-center gap-2.5 border-t border-dashed border-hair px-1 py-3 text-left"
-              >
-                <span className="min-w-0">
-                  <span className="text-sm font-semibold text-tinta">
-                    {account.name}
-                    {vip && (
-                      <em className="ml-1.5 rounded bg-rojo px-1.5 py-px align-[2px] text-[10px] font-bold tracking-[0.06em] text-white not-italic uppercase">
-                        VIP
-                      </em>
-                    )}
-                  </span>
-                  <small className="mt-0.5 block font-mono text-[11.5px] tabular-nums text-tinta-suave">
-                    {pendingCount(accountLines)} ítems · {formatMoney(linesTotal(accountLines))} ·
-                    abierta {formatTime(account.created_at)}
-                  </small>
-                </span>
-                <span className="ml-auto text-base text-tinta-suave" aria-hidden="true">
-                  ›
-                </span>
-              </button>
-            )
-          })}
-
+        <div className="mt-3.5 flex gap-2">
           <button
             type="button"
-            onClick={() => {
-              setAccountName('')
-              setAccountVipId('')
-              setAccountError(null)
-              setSheet({ type: 'abrir-cuenta' })
-            }}
-            className="mt-1.5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-dashed border-rojo py-3 text-[13px] font-bold tracking-[0.06em] text-rojo uppercase"
+            onClick={() => commitLines(lines.filter((line) => line.accountId !== null))}
+            disabled={loose.length === 0 || busy}
+            className="min-h-12 rounded-lg border-[1.5px] border-tinta px-4 text-xs font-semibold tracking-[0.05em] text-tinta uppercase disabled:opacity-40"
           >
-            <MasIcon className="h-4 w-4" />
+            Vaciar
+          </button>
+          <button
+            type="button"
+            onClick={() => void registerComanda()}
+            disabled={loose.length === 0 || busy}
+            className="min-h-12 flex-1 rounded-lg bg-tinta px-4 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-40"
+          >
+            Registrar comanda
+          </button>
+        </div>
+
+        <p className="mt-3.5 border-b-2 border-dashed border-hair-fuerte pb-1.5 text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase">
+          Cuentas abiertas
+        </p>
+
+        {accounts.length === 0 && (
+          <p className="py-3 text-sm text-tinta-suave">No hay cuentas abiertas en este turno.</p>
+        )}
+
+        {accounts.map((account) => {
+          const accountLines = linesForAccount(lines, account.id)
+          const vip = vipCustomers.find((v) => v.id === account.vip_customer_id)
+          return (
+            <button
+              key={account.id}
+              type="button"
+              onClick={() => setSheet({ type: 'account', accountId: account.id })}
+              className="flex w-full items-center gap-2.5 border-t border-dashed border-hair px-1 py-3 text-left"
+            >
+              <span className="min-w-0">
+                <span className="text-sm font-semibold text-tinta">
+                  {account.name}
+                  {vip && (
+                    <em className="ml-1.5 rounded bg-rojo px-1.5 py-px align-[2px] text-[10px] font-bold tracking-[0.06em] text-white not-italic uppercase">
+                      VIP
+                    </em>
+                  )}
+                </span>
+                <small className="mt-0.5 block font-mono text-[11.5px] tabular-nums text-tinta-suave">
+                  {pendingCount(accountLines)} ítems · {formatMoney(linesTotal(accountLines))} ·
+                  abierta {formatTime(account.created_at)}
+                </small>
+              </span>
+              <span className="ml-auto text-base text-tinta-suave" aria-hidden="true">
+                ›
+              </span>
+            </button>
+          )
+        })}
+
+        <button
+          type="button"
+          onClick={() => {
+            setAccountName('')
+            setAccountVipId('')
+            setAccountError(null)
+            setSheet({ type: 'abrir-cuenta' })
+          }}
+          className="mt-1.5 flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border-[1.5px] border-dashed border-rojo py-3 text-[13px] font-bold tracking-[0.06em] text-rojo uppercase"
+        >
+          <MasIcon className="h-4 w-4" />
+          Abrir cuenta
+        </button>
+      </Sheet>
+
+      <Sheet
+        open={sheet?.type === 'abrir-cuenta'}
+        title="Abrir cuenta"
+        heading="Abrir cuenta"
+        subtitle="Poné un nombre o elegí un cliente VIP. Después seguís tocando productos y caen acá."
+        onClose={() =>
+          setSheet((current) => (current?.type === 'abrir-cuenta' ? { type: 'comanda' } : current))
+        }
+      >
+        <form onSubmit={openAccount}>
+          <div className="mb-3.5">
+            <label
+              htmlFor="account-name"
+              className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+            >
+              Nombre de la cuenta (opcional)
+            </label>
+            <input
+              id="account-name"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              placeholder="Mesa 3, Cumpleaños…"
+              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
+            />
+          </div>
+          <div className="mb-3.5">
+            <label
+              htmlFor="account-vip"
+              className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
+            >
+              Cliente VIP (opcional)
+            </label>
+            <select
+              id="account-vip"
+              value={accountVipId}
+              onChange={(e) => setAccountVipId(e.target.value)}
+              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
+            >
+              <option value="">Sin cliente VIP</option>
+              {vipCustomers.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          {accountError && <p className="mb-3 text-sm text-rojo">{accountError}</p>}
+          <button
+            type="submit"
+            disabled={busy}
+            className="min-h-12 w-full rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
+          >
             Abrir cuenta
           </button>
-        </Sheet>
-      )}
+          <p className="mt-3.5 border-t-2 border-dashed border-hair-fuerte pt-3 text-xs leading-[1.5] text-tinta-suave">
+            Puede convivir con otras cuentas abiertas. Registrar la cuenta cobra sus ítems y la
+            limpia.
+          </p>
+        </form>
+      </Sheet>
 
-      {sheet?.type === 'abrir-cuenta' && (
-        <Sheet
-          title="Abrir cuenta"
-          heading="Abrir cuenta"
-          subtitle="Poné un nombre o elegí un cliente VIP. Después seguís tocando productos y caen acá."
-          onClose={() => setSheet({ type: 'comanda' })}
-        >
-          <form onSubmit={openAccount}>
-            <div className="mb-3.5">
-              <label
-                htmlFor="account-name"
-                className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
-              >
-                Nombre de la cuenta (opcional)
-              </label>
-              <input
-                id="account-name"
-                value={accountName}
-                onChange={(e) => setAccountName(e.target.value)}
-                placeholder="Mesa 3, Cumpleaños…"
-                className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
-              />
-            </div>
-            <div className="mb-3.5">
-              <label
-                htmlFor="account-vip"
-                className="mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase"
-              >
-                Cliente VIP (opcional)
-              </label>
-              <select
-                id="account-vip"
-                value={accountVipId}
-                onChange={(e) => setAccountVipId(e.target.value)}
-                className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
-              >
-                <option value="">Sin cliente VIP</option>
-                {vipCustomers.map((v) => (
-                  <option key={v.id} value={v.id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {accountError && <p className="mb-3 text-sm text-rojo">{accountError}</p>}
-            <button
-              type="submit"
-              disabled={busy}
-              className="min-h-12 w-full rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
-            >
-              Abrir cuenta
-            </button>
-            <p className="mt-3.5 border-t-2 border-dashed border-hair-fuerte pt-3 text-xs leading-[1.5] text-tinta-suave">
-              Puede convivir con otras cuentas abiertas. Registrar la cuenta cobra sus ítems y la
-              limpia.
-            </p>
-          </form>
-        </Sheet>
-      )}
-
-      {sheet?.type === 'account' && sheetAccount && (() => {
-        const accountLines = linesForAccount(lines, sheetAccount.id)
-        const vip = vipCustomers.find((v) => v.id === sheetAccount.vip_customer_id)
+      {(() => {
+        const accountLines = sheetAccount ? linesForAccount(lines, sheetAccount.id) : []
+        const vip = sheetAccount
+          ? vipCustomers.find((v) => v.id === sheetAccount.vip_customer_id)
+          : undefined
         return (
           <Sheet
-            title={`Cuenta de ${sheetAccount.name}`}
+            open={sheet?.type === 'account'}
+            title={sheetAccount ? `Cuenta de ${sheetAccount.name}` : 'Cuenta abierta'}
             heading={
-              <>
-                {sheetAccount.name}
-                {vip && (
-                  <em className="ml-1.5 rounded bg-rojo px-1.5 py-px align-[2px] text-[10px] font-bold tracking-[0.06em] text-white not-italic uppercase">
-                    VIP
-                  </em>
-                )}
-              </>
+              sheetAccount ? (
+                <>
+                  {sheetAccount.name}
+                  {vip && (
+                    <em className="ml-1.5 rounded bg-rojo px-1.5 py-px align-[2px] text-[10px] font-bold tracking-[0.06em] text-white not-italic uppercase">
+                      VIP
+                    </em>
+                  )}
+                </>
+              ) : null
             }
-            subtitle={`Abierta ${formatTime(sheetAccount.created_at)} · ${pendingCount(accountLines)} ítems`}
-            onClose={() => setSheet({ type: 'comanda' })}
+            subtitle={
+              sheetAccount
+                ? `Abierta ${formatTime(sheetAccount.created_at)} · ${pendingCount(accountLines)} ítems`
+                : undefined
+            }
+            onClose={() =>
+              setSheet((current) => (current?.type === 'account' ? { type: 'comanda' } : current))
+            }
           >
-            {accountLines.length === 0 ? (
-              <p className="py-2 text-sm text-tinta-suave">
-                Comanda vacía — tocá un producto para anotarla en esta cuenta.
-              </p>
-            ) : (
-              accountLines.map((line) => <TicketRow key={line.key} line={line} />)
-            )}
-            {accountLines.length > 0 && (
-              <div className="flex justify-between pt-2.5 text-sm font-bold text-tinta">
-                <span>Total de la cuenta</span>
-                <span className="font-mono tabular-nums">{formatMoney(linesTotal(accountLines))}</span>
-              </div>
-            )}
-            <div className="mt-3.5 flex gap-2">
-              <button
-                type="button"
-                onClick={() =>
-                  commitLines(lines.filter((line) => line.accountId !== sheetAccount.id))
-                }
-                disabled={accountLines.length === 0 || busy}
-                className="min-h-12 rounded-lg border-[1.5px] border-tinta px-4 text-xs font-semibold tracking-[0.05em] text-tinta uppercase disabled:opacity-40"
-              >
-                Vaciar
-              </button>
-              <button
-                type="button"
-                onClick={() => void registerAccount(sheetAccount)}
-                disabled={accountLines.length === 0 || busy}
-                className="min-h-12 flex-1 rounded-lg bg-tinta px-4 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-40"
-              >
-                Registrar cuenta
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveAccountId(sheetAccount.id)
-                setSheet(null)
-              }}
-              className="mt-2.5 min-h-12 w-full rounded-lg border-[1.5px] border-rojo py-3 text-[13px] font-bold tracking-[0.06em] text-rojo uppercase"
-            >
-              Seguir anotando en esta cuenta
-            </button>
+            {sheetAccount ? (
+              <>
+                {accountLines.length === 0 ? (
+                  <p className="py-2 text-sm text-tinta-suave">
+                    Comanda vacía — tocá un producto para anotarla en esta cuenta.
+                  </p>
+                ) : (
+                  accountLines.map((line) => <TicketRow key={line.key} line={line} />)
+                )}
+                {accountLines.length > 0 && (
+                  <div className="flex justify-between pt-2.5 text-sm font-bold text-tinta">
+                    <span>Total de la cuenta</span>
+                    <span className="font-mono tabular-nums">
+                      {formatMoney(linesTotal(accountLines))}
+                    </span>
+                  </div>
+                )}
+                <div className="mt-3.5 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      commitLines(lines.filter((line) => line.accountId !== sheetAccount.id))
+                    }
+                    disabled={accountLines.length === 0 || busy}
+                    className="min-h-12 rounded-lg border-[1.5px] border-tinta px-4 text-xs font-semibold tracking-[0.05em] text-tinta uppercase disabled:opacity-40"
+                  >
+                    Vaciar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void registerAccount(sheetAccount)}
+                    disabled={accountLines.length === 0 || busy}
+                    className="min-h-12 flex-1 rounded-lg bg-tinta px-4 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-40"
+                  >
+                    Registrar cuenta
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveAccountId(sheetAccount.id)
+                    setSheet(null)
+                  }}
+                  className="mt-2.5 min-h-12 w-full rounded-lg border-[1.5px] border-rojo py-3 text-[13px] font-bold tracking-[0.06em] text-rojo uppercase"
+                >
+                  Seguir anotando en esta cuenta
+                </button>
+              </>
+            ) : null}
           </Sheet>
         )
       })()}
 
-      {confirmingClose && (
-        <Sheet
-          title="Cerrar turno"
-          heading="¿Cerrar turno?"
-          subtitle="Se genera el reporte y no podrás registrar más ventas en este turno."
-          onClose={() => setConfirmingClose(false)}
-        >
-          <div className="mt-1 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setConfirmingClose(false)}
-              className="min-h-12 flex-1 rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => void closeShift()}
-              disabled={busy}
-              className="min-h-12 flex-1 rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
-            >
-              Cerrar turno
-            </button>
-          </div>
-        </Sheet>
-      )}
-
-      {vipPicker && (
-        <Sheet
-          title={`Cortesía: ${vipPicker.name}`}
-          heading={`Cortesía: ${vipPicker.name}`}
-          subtitle="¿Para qué cliente VIP es? (opcional)"
-          onClose={() => setVipPicker(null)}
-        >
-          <select
-            aria-label="Cliente VIP de la cortesía"
-            value={vipCustomerId}
-            onChange={(e) => setVipCustomerId(e.target.value)}
-            className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
+      <Sheet
+        open={confirmingClose}
+        title="Cerrar turno"
+        heading="¿Cerrar turno?"
+        subtitle="Se genera el reporte y no podrás registrar más ventas en este turno."
+        onClose={() => setConfirmingClose(false)}
+      >
+        <div className="mt-1 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setConfirmingClose(false)}
+            className="min-h-12 flex-1 rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
           >
-            <option value="">Sin asignar</option>
-            {vipCustomers.map((v) => (
-              <option key={v.id} value={v.id}>
-                {v.name}
-              </option>
-            ))}
-          </select>
-          {vipCustomers.length === 0 && (
-            <p className="mt-2 text-xs text-tinta-suave">
-              Todavía no hay clientes VIP cargados: el encargado los administra en “Clientes VIP”.
-            </p>
-          )}
-          <div className="mt-3.5 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setVipPicker(null)}
-              className="min-h-12 flex-1 rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={() => void closeShift()}
+            disabled={busy}
+            className="min-h-12 flex-1 rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
+          >
+            Cerrar turno
+          </button>
+        </div>
+      </Sheet>
+
+      <Sheet
+        open={vipPicker !== null}
+        title={vipPicker ? `Cortesía: ${vipPicker.name}` : 'Cortesía'}
+        heading={vipPicker ? `Cortesía: ${vipPicker.name}` : null}
+        subtitle="¿Para qué cliente VIP es? (opcional)"
+        onClose={() => setVipPicker(null)}
+      >
+        {vipPicker ? (
+          <>
+            <select
+              aria-label="Cliente VIP de la cortesía"
+              value={vipCustomerId}
+              onChange={(e) => setVipCustomerId(e.target.value)}
+              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
             >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                const product = vipPicker
-                setVipPicker(null)
-                noteProduct(product, true, vipCustomerId || null)
-              }}
-              disabled={busy}
-              className="min-h-12 flex-1 rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
-            >
-              Anotar cortesía
-            </button>
-          </div>
-        </Sheet>
-      )}
+              <option value="">Sin asignar</option>
+              {vipCustomers.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+            {vipCustomers.length === 0 && (
+              <p className="mt-2 text-xs text-tinta-suave">
+                Todavía no hay clientes VIP cargados: el encargado los administra en “Clientes
+                VIP”.
+              </p>
+            )}
+            <div className="mt-3.5 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setVipPicker(null)}
+                className="min-h-12 flex-1 rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!vipPicker) return
+                  const product = vipPicker
+                  setVipPicker(null)
+                  noteProduct(product, true, vipCustomerId || null)
+                }}
+                disabled={busy}
+                className="min-h-12 flex-1 rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
+              >
+                Anotar cortesía
+              </button>
+            </div>
+          </>
+        ) : null}
+      </Sheet>
     </main>
   )
 }

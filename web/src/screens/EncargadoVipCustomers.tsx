@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { ScreenHead } from '../components/ScreenHead'
+import { ListRowsSkeleton } from './skeleton'
 import type { VipCustomer } from '../lib/types'
 
 function VipForm({
@@ -115,7 +116,7 @@ export function VipCustomersTab() {
       </p>
 
       {error && (
-        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
+        <p className="anim-slide-down mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
@@ -155,7 +156,7 @@ export function VipCustomersTab() {
 
       <div>
         {customers === null ? (
-          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
+          <ListRowsSkeleton label="Cargando clientes VIP" rows={4} />
         ) : customers.length === 0 ? (
           <p className="py-3 text-sm text-tinta-suave">Todavía no hay clientes VIP cargados.</p>
         ) : (

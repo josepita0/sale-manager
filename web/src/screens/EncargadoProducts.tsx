@@ -5,6 +5,7 @@ import { Drawer } from '../components/Drawer'
 import { Sheet } from '../components/Sheet'
 import { ScreenHead } from '../components/ScreenHead'
 import { LapizIcon, MasIcon, PausaIcon, TachoIcon } from '../components/icons'
+import { ListRowsSkeleton } from './skeleton'
 import type { Product } from '../lib/types'
 
 function ProductForm({
@@ -155,7 +156,7 @@ export function ProductsTab() {
       />
 
       {error && (
-        <p className="mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
+        <p className="anim-slide-down mb-3 rounded-lg border border-rojo/40 bg-rojo/5 px-3 py-2 text-sm text-rojo">
           {error}
         </p>
       )}
@@ -173,7 +174,7 @@ export function ProductsTab() {
 
       <div className="mt-3.5">
         {products === null ? (
-          <p className="py-3 text-sm text-tinta-suave">Cargando…</p>
+          <ListRowsSkeleton label="Cargando productos" rows={6} />
         ) : products.length === 0 ? (
           <p className="py-3 text-sm text-tinta-suave">El catálogo está vacío.</p>
         ) : (
@@ -204,13 +205,16 @@ export function ProductsTab() {
         )}
       </div>
 
-      {editing && (
-        <Drawer
-          title={editing === 'new' ? 'Nuevo producto' : `Editar ${editing.name}`}
-          heading={editing === 'new' ? 'Nuevo producto' : 'Editar producto'}
-          subtitle="Vender o regalar se decide en el turno, no acá."
-          onClose={() => setEditing(null)}
-        >
+      <Drawer
+        open={editing !== null}
+        title={
+          editing === 'new' ? 'Nuevo producto' : editing ? `Editar ${editing.name}` : 'Producto'
+        }
+        heading={editing === 'new' ? 'Nuevo producto' : 'Editar producto'}
+        subtitle="Vender o regalar se decide en el turno, no acá."
+        onClose={() => setEditing(null)}
+      >
+        {editing ? (
           <ProductForm
             key={editing === 'new' ? 'new' : editing.id}
             initial={editing === 'new' ? null : editing}
@@ -220,62 +224,67 @@ export function ProductsTab() {
             }}
             onError={setError}
           />
-        </Drawer>
-      )}
+        ) : null}
+      </Drawer>
 
-      {actionsFor && (
-        <Sheet
-          title={`Acciones de ${actionsFor.name}`}
-          heading={actionsFor.name}
-          subtitle={
+      <Sheet
+        open={actionsFor !== null}
+        title={actionsFor ? `Acciones de ${actionsFor.name}` : 'Acciones'}
+        heading={actionsFor?.name ?? null}
+        subtitle={
+          actionsFor ? (
             <span className="font-mono tabular-nums">
               {formatMoney(actionsFor.price)} · {actionsFor.active ? 'activo' : 'inactivo'}
             </span>
-          }
-          onClose={() => setActionsFor(null)}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              const product = actionsFor
-              setActionsFor(null)
-              setEditing(product)
-            }}
-            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta"
-          >
-            <LapizIcon className="h-[19px] w-[19px] text-tinta-suave" />
-            Editar precio o nombre
-          </button>
-          <button
-            type="button"
-            onClick={() => void toggleActive(actionsFor)}
-            disabled={busy}
-            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta disabled:opacity-40"
-          >
-            <PausaIcon className="h-[19px] w-[19px] text-tinta-suave" />
-            {actionsFor.active ? 'Desactivar' : 'Activar'}
-            <small className="ml-auto text-[11px] font-normal text-tinta-suave">
-              {actionsFor.active ? 'sale de la grilla' : 'vuelve a la grilla'}
-            </small>
-          </button>
-          <button
-            type="button"
-            onClick={() => void remove(actionsFor)}
-            disabled={busy}
-            className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-rojo disabled:opacity-40"
-          >
-            <TachoIcon className="h-[19px] w-[19px]" />
-            Eliminar
-          </button>
-          <button
-            type="button"
-            onClick={() => setActionsFor(null)}
-            className="mt-3 min-h-12 w-full rounded-lg border-[1.5px] border-tinta text-[13px] font-semibold tracking-[0.05em] text-tinta uppercase"
-          >
-            Cancelar
-          </button>
-        </Sheet>
-      )}
+          ) : undefined
+        }
+        onClose={() => setActionsFor(null)}
+      >
+        {actionsFor ? (
+          <>
+            <button
+              type="button"
+              onClick={() => {
+                const product = actionsFor
+                setActionsFor(null)
+                setEditing(product)
+              }}
+              className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta"
+            >
+              <LapizIcon className="h-[19px] w-[19px] text-tinta-suave" />
+              Editar precio o nombre
+            </button>
+            <button
+              type="button"
+              onClick={() => void toggleActive(actionsFor)}
+              disabled={busy}
+              className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-tinta disabled:opacity-40"
+            >
+              <PausaIcon className="h-[19px] w-[19px] text-tinta-suave" />
+              {actionsFor.active ? 'Desactivar' : 'Activar'}
+              <small className="ml-auto text-[11px] font-normal text-tinta-suave">
+                {actionsFor.active ? 'sale de la grilla' : 'vuelve a la grilla'}
+              </small>
+            </button>
+            <button
+              type="button"
+              onClick={() => void remove(actionsFor)}
+              disabled={busy}
+              className="flex min-h-12 w-full items-center gap-3 border-t border-dashed border-hair px-1 py-3 text-left text-sm font-semibold text-rojo disabled:opacity-40"
+            >
+              <TachoIcon className="h-[19px] w-[19px]" />
+              Eliminar
+            </button>
+            <button
+              type="button"
+              onClick={() => setActionsFor(null)}
+              className="mt-3 min-h-12 w-full rounded-lg border-[1.5px] border-tinta text-[13px] font-semibold tracking-[0.05em] text-tinta uppercase"
+            >
+              Cancelar
+            </button>
+          </>
+        ) : null}
+      </Sheet>
     </main>
   )
 }

@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import type { Profile } from './lib/types'
 import { AppHeader, Splash } from './components/AppHeader'
+import { Toaster } from './components/Toast'
 import { Login } from './screens/Login'
 import { BartenderShift } from './screens/BartenderShift'
 import { EncargadoHome } from './screens/EncargadoHome'
@@ -64,6 +65,7 @@ export default function App() {
       ) : (
         <BartenderShift profile={profile} />
       )}
+      <Toaster />
     </div>
   )
 }
