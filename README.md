@@ -7,7 +7,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 - Registro táctil de ventas y cortesías durante el turno (botón abrir/cerrar).
 - Reporte al cerrar: cantidades por producto, subtotal, total recaudado y valor regalado en cortesías.
 - Clientes VIP (opcional): al registrar una cortesía se puede elegir a qué cliente VIP va destinada.
-- Vista de encargado: ABM de productos, clientes VIP e historial de todos los turnos.
+- Vista de encargado: ABM de productos, clientes VIP, historial de todos los turnos y su propio turno (puede además atender la barra).
 
 - **Frontend:** React + Vite + TypeScript + Tailwind (`web/`)
 - **Backend + BD:** Supabase — Postgres con Row Level Security, Auth con roles (`supabase/migrations/`)

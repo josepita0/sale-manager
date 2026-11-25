@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import type { Profile } from '../lib/types'
+import { BartenderShift } from './BartenderShift'
 import { HistoryTab } from './EncargadoHistory'
 import { ProductsTab } from './EncargadoProducts'
 import { VipCustomersTab } from './EncargadoVipCustomers'
 
-type Tab = 'productos' | 'turnos' | 'clientes'
+type Tab = 'turno' | 'productos' | 'turnos' | 'clientes'
 
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: string }) {
   return (
@@ -18,12 +20,15 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
   )
 }
 
-export function EncargadoHome() {
-  const [tab, setTab] = useState<Tab>('productos')
+export function EncargadoHome({ profile }: { profile: Profile }) {
+  const [tab, setTab] = useState<Tab>('turno')
 
   return (
     <main className="mx-auto max-w-3xl p-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
+        <TabButton active={tab === 'turno'} onClick={() => setTab('turno')}>
+          Mi turno
+        </TabButton>
         <TabButton active={tab === 'productos'} onClick={() => setTab('productos')}>
           Productos
         </TabButton>
@@ -35,7 +40,15 @@ export function EncargadoHome() {
         </TabButton>
       </div>
       <div className="mt-4">
-        {tab === 'productos' ? <ProductsTab /> : tab === 'turnos' ? <HistoryTab /> : <VipCustomersTab />}
+        {tab === 'turno' ? (
+          <BartenderShift profile={profile} />
+        ) : tab === 'productos' ? (
+          <ProductsTab />
+        ) : tab === 'turnos' ? (
+          <HistoryTab />
+        ) : (
+          <VipCustomersTab />
+        )}
       </div>
     </main>
   )
