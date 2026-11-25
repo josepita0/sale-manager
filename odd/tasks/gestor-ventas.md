@@ -11,6 +11,8 @@ S4. Usuarios: bartender + encargado; el encargado administra productos y ve el h
 S5. Turno con botón abrir/cerrar; al cerrar se genera el reporte (respuesta: "Botón abrir/cerrar").
 S6. El reporte incluye montos: subtotal por producto y total recaudado (respuesta: "Cantidades + dinero"). Extra acordado en propuesta: valor regalado en cortesías.
 S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.supabase.co con publishable key; las claves viven en web/.env (gitignored), nunca en el repo.
+S8. "El repo va a ser publico, entonces quiero las mejores praxis, estructura, etc" — LICENSE MIT, CI, README público, .env.example, origin https://github.com/josepita0/sale-manager.git.
+S9. "me gustaria que opcionalmente puedas agregar un apartado de 'clientes vip' que sea opcional, si selecciona 'is_invitation' se aperture un select con los 'clientes vip' previamente cargados" — al registrar una cortesía se abre un select opcional de clientes VIP; el encargado los administra.
 
 ## Tasks
 
@@ -20,6 +22,10 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 - T4 (S1,S6) web: reporte de turno (cantidades, dinero, cortesías) con tests — commit C3
 - T5 (S4) web: vista encargado (ABM productos + historial de turnos) — commit C4
 - T6 (S1-S6) verificación: build, tests, instrucciones de setup — commit C5 o doc
+- T7 (S1) fix de fondo R3-001: snapshot is_invitation en sales — migrations/0002 + report — commit f3c91ae
+- T8 (S9) feature Clientes VIP — migrations/0003 + picker + ABM — commit a26bab3
+- T9 (S8) prácticas repo público (LICENSE, CI, README, .env.example) — commit docs
+- T10 (S1-S9) revisión nativa del nuevo candidato y push a origin
 
 ## Log
 
@@ -28,3 +34,6 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 - L3. Usuario proveyó Supabase URL https://kjuhrgfqbgdbvqsldnyl.supabase.co y anon key (publishable).
 - L4. La política de seguridad del harness bloqueó escribir web/.env; el usuario eligió "Más tarde": creará el archivo él mismo con el contenido que se le pasa al cierre. La app muestra un error claro si faltan las variables.
 - L5. Implementación completa: C1 esquema+RLS, C2 scaffold+turno, C3 reporte+tests (RED→GREEN), C4 vista encargado. Verificación: vitest 4/4 y build (tsc+vite) en verde. Smoke end-to-end pendiente del setup del usuario (SQL + cuentas + .env).
+- L6. Revisión nativa (base 9e39f38): hallazgo CRÍTICO R3-001 (clasificación de reporte leía el flag mutable del producto). La corrección parcial (lock en formulario) fue rechazada por el validador dirigido: "No snapshot of is_invitation is added to Sale or database constraint/trigger". Linaje escalado (terminal). Fix de fondo implementado: migration 0002 snapshot en sales + report lee el snapshot + 2 tests nuevos; se quitó el lock parcial.
+- L7. Usuario: "aparte, me gustaria que opcionalmente puedas agregar un apartado de 'clientes vip' que sea opcional, si selecciona 'is_invitation' se aperture un select con los 'clientes vip' previamente cargados" → migration 0003 (vip_customers + sales.vip_customer_id), picker opcional al registrar cortesía, pestaña Clientes VIP del encargado.
+- L8. Usuario: "Este es el repo remoto al que vas a agregar el origin: https://github.com/josepita0/sale-manager.git El repo va a ser publico, entonces quiero las mejores praxis, estructura, etc" → origin agregado; LICENSE MIT, CI, README público; push tras revisar el nuevo candidato.
