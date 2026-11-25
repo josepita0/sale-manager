@@ -27,3 +27,4 @@ S7. Proyecto Supabase provisto por el usuario: URL https://kjuhrgfqbgdbvqsldnyl.
 - L2. Respuestas de diseño (pregunta agrupada): invitaciones = "Cortesías que regala"; usuarios = "Bartender + encargado"; turnos = "Botón abrir/cerrar"; reporte = "Cantidades + dinero".
 - L3. Usuario proveyó Supabase URL https://kjuhrgfqbgdbvqsldnyl.supabase.co y anon key (publishable).
 - L4. La política de seguridad del harness bloqueó escribir web/.env; el usuario eligió "Más tarde": creará el archivo él mismo con el contenido que se le pasa al cierre. La app muestra un error claro si faltan las variables.
+- L5. Implementación completa: C1 esquema+RLS, C2 scaffold+turno, C3 reporte+tests (RED→GREEN), C4 vista encargado. Verificación: vitest 4/4 y build (tsc+vite) en verde. Smoke end-to-end pendiente del setup del usuario (SQL + cuentas + .env).

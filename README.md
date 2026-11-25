@@ -22,18 +22,20 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ## Frontend
 
+Antes de correr la app, creá el archivo `web/.env` (no se sube al repo) con las claves de tu proyecto:
+
+```
+VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_XXXX
+```
+
 ```bash
 cd web
 npm install
 npm run dev
 ```
 
-Las credenciales de Supabase van en `web/.env` (ya creado; no se sube al repo):
-
-```
-VITE_SUPABASE_URL=https://kjuhrgfqbgdbvqsldnyl.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_...
-```
+Si faltan esas variables, la app muestra un error claro al arrancar.
 
 ## Scripts
 
