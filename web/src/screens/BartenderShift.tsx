@@ -340,7 +340,11 @@ export function BartenderShift({ profile, embedded = false }: Props) {
       setBusy(false)
       return
     }
-    await loadAccounts(shift.id)
+    await loadAccounts(shift.id).catch(() => {})
+    // Append locally so the chip never points at an account the fetch failed to load.
+    setAccounts((prev) =>
+      prev.some((a) => a.id === (data as Account).id) ? prev : [...prev, data as Account],
+    )
     setActiveAccountId((data as Account).id)
     setAccountName('')
     setAccountVipId('')
@@ -352,6 +356,13 @@ export function BartenderShift({ profile, embedded = false }: Props) {
     if (!shift) return
     setBusy(true)
     setError(null)
+    // Close any open accounts first so no row gets stuck in 'open' forever.
+    const { error: accError } = await supabase
+      .from('accounts')
+      .update({ status: 'closed' })
+      .eq('shift_id', shift.id)
+      .eq('status', 'open')
+    if (accError) setError('No se pudieron cerrar las cuentas abiertas: ' + accError.message)
     const { data, error } = await supabase
       .from('shifts')
       .update({ status: 'closed', ended_at: new Date().toISOString() })

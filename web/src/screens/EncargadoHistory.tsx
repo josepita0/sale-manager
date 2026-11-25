@@ -20,7 +20,7 @@ export function HistoryTab() {
     setError(null)
     const { data, error } = await supabase
       .from('shifts')
-      .select('*, profiles(full_name), sales(*, products(name, price, is_invitation))')
+      .select('*, profiles(full_name), sales(*, products(name, price))')
       .eq('status', 'closed')
       .order('started_at', { ascending: false })
       .limit(50)
