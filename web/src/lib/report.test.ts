@@ -16,6 +16,7 @@ function makeSale(overrides: Partial<SaleWithProduct> & { product_id: string }):
     created_at: '2024-01-01T00:00:00Z',
     products: { name: 'Producto', price: 1000 },
     ...rest,
+    price_override: rest.price_override ?? null,
   }
 }
 
