@@ -16,7 +16,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ## Setup de Supabase (una sola vez)
 
-1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0007): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
+1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0008): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
 2. **Usuarios:** **Authentication → Users → Add user → Create new user**. Cargá email + contraseña y marcá *Auto Confirm User*. Creá así la cuenta del bartender y la del encargado.
 3. **Promover al encargado:** en **SQL Editor** ejecutá (reemplazá el email):
 
