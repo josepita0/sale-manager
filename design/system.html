@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Sistema — Naira's</title>
+<style>
+  :root{
+    --papel:#fbf7ef;--carta:#ffffff;--tinta:#231c12;--tinta-suave:#7a6f5c;
+    --hair:#e3d9c6;--hair-fuerte:#cfc4ac;--rojo:#b3402a;--verde:#1f6e43;--crema:#efe8d9;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--papel);color:var(--tinta);padding:48px;-webkit-font-smoothing:antialiased}
+  h1{font-size:32px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+  h2{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);margin:40px 0 16px;border-bottom:1px solid var(--hair);padding-bottom:8px}
+  .swatches{display:flex;gap:16px;flex-wrap:wrap}
+  .sw{width:150px}
+  .chip{height:64px;border-radius:12px;border:1px solid var(--hair)}
+  .sw p{font-size:12px;margin-top:6px;color:var(--tinta-suave)}
+  .sw code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11px}
+  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end}
+  .card{background:var(--carta);border:1px solid var(--hair);border-radius:8px;padding:24px;box-shadow:0 6px 18px rgba(60,45,20,.10);width:300px}
+  .micro{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);display:block;margin-bottom:6px}
+  input{height:48px;width:100%;border-radius:8px;border:1px solid var(--hair-fuerte);background:var(--papel);padding:0 14px;font-size:15px;color:var(--tinta);font-family:inherit}
+  .btn{height:48px;width:100%;border:0;border-radius:8px;background:var(--tinta);color:var(--papel);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:inherit;margin-top:16px;cursor:pointer}
+  .err{border:1px solid rgba(179,64,42,.4);background:rgba(179,64,42,.05);border-radius:8px;padding:8px 12px;font-size:14px;color:var(--rojo);margin-top:16px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
+  table{border-collapse:collapse;font-size:13px}
+  td,th{border:1px solid var(--hair);padding:6px 12px;text-align:left}
+  th{background:var(--crema);font-weight:600}
+  :focus-visible{outline:2px solid var(--rojo);outline-offset:2px}
+</style>
+</head>
+<body>
+  <h1>Naira's — sistema</h1>
+  <p style="margin-top:8px;color:var(--tinta-suave);font-size:14px">Tokens desde <code>web/src/styles.css</code>. Interior claro: papel + carta, acentos tinta y rojo.</p>
+
+  <h2>Colores</h2>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#fbf7ef"></div><p><code>--color-papel</code><br>#fbf7ef</p></div>
+    <div class="sw"><div class="chip" style="background:#ffffff"></div><p><code>--color-carta</code><br>#ffffff</p></div>
+    <div class="sw"><div class="chip" style="background:#231c12"></div><p><code>--color-tinta</code><br>#231c12</p></div>
+    <div class="sw"><div class="chip" style="background:#7a6f5c"></div><p><code>--color-tinta-suave</code><br>#7a6f5c</p></div>
+    <div class="sw"><div class="chip" style="background:#e3d9c6"></div><p><code>--color-hair</code><br>#e3d9c6</p></div>
+    <div class="sw"><div class="chip" style="background:#cfc4ac"></div><p><code>--color-hair-fuerte</code><br>#cfc4ac</p></div>
+    <div class="sw"><div class="chip" style="background:#b3402a"></div><p><code>--color-rojo</code><br>#b3402a</p></div>
+    <div class="sw"><div class="chip" style="background:#1f6e43"></div><p><code>--color-verde</code><br>#1f6e43</p></div>
+    <div class="sw"><div class="chip" style="background:#efe8d9"></div><p><code>--color-crema</code><br>#efe8d9</p></div>
+  </div>
+
+  <h2>Tipografía</h2>
+  <div class="row">
+    <div>
+      <p style="font-size:28px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Naira's</p>
+      <p style="font-size:14px;color:var(--tinta-suave);margin-top:4px">font-sans — títulos y cuerpo</p>
+    </div>
+    <div>
+      <p class="mono">TURNO #0142 — 21:30</p>
+      <p style="font-size:14px;color:var(--tinta-suave);margin-top:4px">font-mono — datos de turno</p>
+    </div>
+    <div>
+      <span class="micro">Micro-label</span>
+      <p style="font-size:14px;color:var(--tinta-suave)">10px · semibold · uppercase · tracking .14em</p>
+    </div>
+  </div>
+
+  <h2>Componentes</h2>
+  <div class="row">
+    <div class="card">
+      <span class="micro">Email</span>
+      <input type="text" placeholder="vos@nairas.bar" aria-label="Email de ejemplo">
+      <span class="micro" style="margin-top:16px">Contraseña</span>
+      <input type="password" aria-label="Contraseña de ejemplo">
+      <button class="btn" type="button">Iniciar sesión</button>
+      <p class="err">No pudimos iniciar sesión. Revisá el email y la contraseña.</p>
+    </div>
+    <table>
+      <tr><th>Animación</th><th>Tiempo</th><th>Uso</th></tr>
+      <tr><td><code>sheet-in</code></td><td>220ms · cubic-bezier(.2,0,0,1)</td><td>Sheets desde abajo</td></tr>
+      <tr><td><code>drawer-in</code></td><td>240ms · cubic-bezier(.2,0,0,1)</td><td>Panel lateral</td></tr>
+      <tr><td><code>fade-in</code></td><td>180ms · ease-out</td><td>Overlays</td></tr>
+      <tr><td><code>pop-in</code></td><td>180ms · cubic-bezier(.2,0,0,1)</td><td>Cards</td></tr>
+      <tr><td><code>toast-in</code></td><td>200ms · cubic-bezier(.2,0,0,1)</td><td>Toasts</td></tr>
+    </table>
+  </div>
+</body>
+</html>
