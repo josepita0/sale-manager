@@ -1,4 +1,4 @@
-# Sistema de diseño — Naira's (sale-manager)
+# Sistema de diseño — La Barra (sale-manager)
 
 Fuente única de tokens: `web/src/styles.css` (Tailwind v4 `@theme`). Reglas de componentes observadas en `web/src/screens/Login.tsx`.
 
