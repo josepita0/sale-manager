@@ -2,8 +2,10 @@
 
 > **Documento para publicar.** Antes de publicarlo, completá los campos entre
 > `[CORCHETES]` con los datos del local (responsable, contacto y región del
-> proyecto). Este aviso está escrito para el personal de la barra y para las
-> personas cuyos datos se registran en la app (por ejemplo, clientes VIP).
+> proyecto). Este aviso es para el personal de la barra y para las personas
+> cuyos datos se registran en la app (por ejemplo, clientes VIP).
+> **Copia embebida:** la app muestra este mismo texto en la pantalla
+> "Privacidad y datos" (login y Mi cuenta) — actualizá ambas copias juntas.
 
 ## 1. Responsable del tratamiento
 

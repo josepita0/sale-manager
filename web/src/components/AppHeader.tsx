@@ -4,6 +4,7 @@ import { initials } from '../lib/format'
 import { Sheet } from './Sheet'
 import { PasswordInput } from './PasswordInput'
 import { toast } from './Toast'
+import { Privacidad } from './Privacidad'
 import { validateChangePassword } from '../lib/changePassword'
 import { ROLE_LABEL, type Profile } from '../lib/types'
 
@@ -22,6 +23,7 @@ export function AppHeader({ profile, email, children }: Props) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [pwOpen, setPwOpen] = useState(false)
+  const [privOpen, setPrivOpen] = useState(false)
   const [pwCurrent, setPwCurrent] = useState('')
   const [pwNext, setPwNext] = useState('')
   const [pwConfirm, setPwConfirm] = useState('')
@@ -128,6 +130,16 @@ export function AppHeader({ profile, email, children }: Props) {
         </button>
         <button
           type="button"
+          onClick={() => {
+            setMenuOpen(false)
+            setPrivOpen(true)
+          }}
+          className="mt-2.5 min-h-12 w-full rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
+        >
+          Privacidad y datos
+        </button>
+        <button
+          type="button"
           onClick={() => void signOut()}
           disabled={signingOut}
           className="mt-2.5 min-h-12 w-full rounded-lg bg-rojo text-[13px] font-bold tracking-[0.05em] text-white uppercase transition-opacity disabled:opacity-50"
@@ -184,6 +196,8 @@ export function AppHeader({ profile, email, children }: Props) {
           </button>
         </form>
       </Sheet>
+
+      {privOpen && <Privacidad onBack={() => setPrivOpen(false)} />}
     </header>
   )
 }

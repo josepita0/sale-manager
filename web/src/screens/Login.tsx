@@ -1,12 +1,14 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { PasswordInput } from '../components/PasswordInput'
+import { Privacidad } from '../components/Privacidad'
 
 export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [privOpen, setPrivOpen] = useState(false)
   const ticketNo = useMemo(
     () => String(Math.floor(Math.random() * 9000) + 1000).padStart(4, '0'),
     [],
@@ -119,7 +121,16 @@ export function Login() {
         <p className="login-barcode-cap" aria-hidden="true">
           BAR·TURNO·{ticketNo}
         </p>
+        <button
+          type="button"
+          onClick={() => setPrivOpen(true)}
+          className="mt-2 w-full text-center text-xs text-tinta-suave underline underline-offset-2 transition-colors hover:text-tinta"
+        >
+          Privacidad y datos
+        </button>
       </main>
+
+      {privOpen && <Privacidad onBack={() => setPrivOpen(false)} />}
     </div>
   )
 }
