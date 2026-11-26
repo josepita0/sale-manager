@@ -58,4 +58,33 @@ describe('buildShiftReport with price overrides', () => {
     expect(report.adjusted).toEqual([])
     expect(report.discountTotal).toBe(0)
   })
+
+  it('opens one reconciling row per distinct override price of the same product', () => {
+    const report = buildShiftReport([
+      sale({ quantity: 2, price_override: 2 }),
+      sale({ quantity: 1, price_override: 1 }),
+    ])
+    expect(report.adjusted).toEqual([
+      {
+        productId: 'p1',
+        name: 'Cerveza',
+        quantity: 2,
+        catalogUnitPrice: 3,
+        effectiveUnitPrice: 2,
+        discount: 2,
+      },
+      {
+        productId: 'p1',
+        name: 'Cerveza',
+        quantity: 1,
+        catalogUnitPrice: 3,
+        effectiveUnitPrice: 1,
+        discount: 2,
+      },
+    ])
+    expect(report.discountTotal).toBe(4)
+    for (const row of report.adjusted) {
+      expect(row.quantity * (row.catalogUnitPrice - row.effectiveUnitPrice)).toBe(row.discount)
+    }
+  })
 })

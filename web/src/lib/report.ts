@@ -72,7 +72,10 @@ export function buildShiftReport(sales: SaleWithProduct[]): ShiftReportData {
     target.set(sale.product_id, line)
 
     if (!sale.is_invitation && sale.price_override !== null && sale.price_override < sale.unit_price) {
-      const adjusted = adjustedMap.get(sale.product_id) ?? {
+      // One row per distinct (product, catalog price, agreed price): a row must
+      // always reconcile quantity x prices with its stated discount.
+      const adjustedKey = `${sale.product_id}|${sale.unit_price}|${sale.price_override}`
+      const adjusted = adjustedMap.get(adjustedKey) ?? {
         productId: sale.product_id,
         name: sale.products.name,
         quantity: 0,
@@ -81,9 +84,8 @@ export function buildShiftReport(sales: SaleWithProduct[]): ShiftReportData {
         discount: 0,
       }
       adjusted.quantity += sale.quantity
-      adjusted.effectiveUnitPrice = sale.price_override
       adjusted.discount += sale.quantity * (sale.unit_price - sale.price_override)
-      adjustedMap.set(sale.product_id, adjusted)
+      adjustedMap.set(adjustedKey, adjusted)
     }
   }
 
