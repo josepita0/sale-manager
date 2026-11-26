@@ -1,6 +1,7 @@
 # Gestor de ventas de barra
 
 App ligera para que un bartender registre ventas y cortesías de su turno y cierre con un reporte; vista de encargado para productos e historial. React + Vite + TS + Tailwind; Supabase (Postgres + Auth + RLS).
+Rama `dev`; entrega `ask-on-risk` (push/PR queda decisión del usuario); tests: `npm test` (vitest) en web; sin runner local para SQL ni Deno (deno CLI no instalada).
 
 ## Specs
 
@@ -18,6 +19,8 @@ S11. "La logica de la cortesia esta mal implementada. No es producto sino por ve
 S12. "El nombre no va a ser gestor de barra, como marca del sistema que se llame 'Naira's'" — la marca del sistema es Naira's (UI, título, README, diseño).
 S13. Usuario eligió la dirección visual 02 (Comanda de papel): tema claro papel/tinta, bottom bar de navegación, alta en drawer, acciones de ítem en bottom sheet (···).
 S14. "que la opcion de ticket sea una opcion flotante... una especie de 'ticket' y que luego cuando se registre se limpie... no tengamos que hacer tanto scroll" + "Abrir cuenta... se mantendra abierta una cuenta y podras seguir registrando otros productos en paralelo, debera poderse registrar un nombre o seleccionar un cliente vio": FAB de ticket sobre la grilla, comanda pendiente que se registra por lote y se limpia, cuentas abiertas en paralelo (nombre libre o cliente VIP) registrables una por una — con soporte en BD (tabla accounts + sales.account_id).
+S15. "Bello, tomando en cuenta la nueva parte de roles, quiero que lo unico diferente que haga el role admin sea poder crear usuarios. Explicame, se puede crear usuario a traves de la interfaz sin tener que enviar email, que sean directamnete autoconfirm? Solo se ingresaria full_name, role y un apartado para que el usuario pueda ingresar su contraseña"
+S16. Decisión aprobada (usuario eligió "Sí, implementalo", ruta simple): la creación de usuarios va por una Edge Function con la Admin API de Supabase (`email_confirm: true`, sin envío de email); el email sigue siendo el identificador de login aunque nunca se envíe correo; formulario email/full_name/role/contraseña (la contraseña inicial la carga el admin); solo el admin ve la pestaña Usuarios; el trigger de signup toma el rol desde user_metadata. Cambio de contraseña por el propio usuario queda fuera de alcance aprobado (follow-up).
 
 ## Tasks
 
@@ -36,6 +39,10 @@ S14. "que la opcion de ticket sea una opcion flotante... una especie de 'ticket'
 - T13 (S14) migración accounts + sales.account_id — supabase/migrations/0005_accounts.sql
 - T14 (S13,S14) rediseño dirección 02: tema claro, bottom bar, FAB ticket, comanda pendiente por lote, cuentas abiertas — web/src
 - T15 (S1-S14) verificación, revisión nativa y push
+- T16 (S15,S16) db: trigger de signup lee el rol desde user_metadata con fallback bartender — supabase/migrations/0007_signup_role_metadata.sql — commit
+- T17 (S15,S16) functions: Edge Function create-user (gate admin, autoconfirmado, sin email) + README deploy — supabase/functions/create-user/index.ts — commit
+- T18 (S15,S16) web: pestaña Usuarios (solo admin): lista de perfiles + alta con validación test-first — web/src/screens/EncargadoUsers.tsx, lib/newUser — commit
+- T19 (S15,S16) verificación: vitest + build, subagent verify (seguridad), assess/revisión nativa del candidato — cierre
 
 ## Log
 
@@ -59,3 +66,4 @@ S14. "que la opcion de ticket sea una opcion flotante... una especie de 'ticket'
 - L19. Usuario: "Debemos cambiar la property de Role de la BD, debe ser un Enum, quiero que los roles sean ADMIN-MANAGER-BARTENDER. Ajusta las vistas a eso, y ademas, luego definimos la permisologia de ADMIN" → migration 0006 (enum user_role, 'encargado'→'manager', is_encargado cubre manager+admin, is_admin() lista para la futura permisología); vistas con ROLE_LABEL y ruteo admin/manager → encargado.
 - L17. Usuario: "Bello, nos vamos con la segunda direccion. Toma en cuenta lo que comente tambien para hacer ajustes en backend y base de datos" → se implementa la dirección 02 completa con soporte de BD para cuentas (migration 0005 + accounts/sales.account_id) y rediseño frontend delegado a worker con la artboard como spec visual.
 - L20. Corrección nativa del candidato roles (linaje review-e3191d544438e34b): R3-001 BLOCKER confirmado por validador (falta drop default antes del ALTER TYPE); fix aplicado (5c19b0c, drop default + transacción) y APROBADO. Advisory: revocar EXECUTE público de las funciones security definer (hardening barato).
+- L21. Usuario: "Bello, tomando en cuenta la nueva parte de roles, quiero que lo unico diferente que haga el role admin sea poder crear usuarios. Explicame, se puede crear usuario a traves de la interfaz sin tener que enviar email, que sean directamnete autoconfirm? Solo se ingresaria full_name, role y un apartado para que el usuario pueda ingresar su contraseña" → explicado el camino (Admin API requiere service_role → Edge Function; el email sigue siendo identificador; trigger hardcodea bartender); el usuario eligió "Sí, implementalo" (ruta simple, sin cambio forzado de contraseña). Spec S15-S16, tareas T16-T19. Último límite revisado: 5c19b0c (roles APROBADO; f6cf943 docs posterior).
