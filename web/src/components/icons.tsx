@@ -44,6 +44,17 @@ export function TicketIcon(props: IconProps) {
   )
 }
 
+/** Usuarios — pestaña Usuarios del admin. */
+export function UsuariosIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6S13.9 16 14.5 19" />
+      <path d="M15.5 5.4a3.2 3.2 0 0 1 0 5.2M17.5 14.6c1.8.7 2.8 2.2 3 4.4" />
+    </Svg>
+  )
+}
+
 /** Barras — pestaña Reporte. */
 export function BarrasIcon(props: IconProps) {
   return (
