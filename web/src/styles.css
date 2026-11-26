@@ -84,6 +84,218 @@
 .anim-badge-pop { animation: badge-pop 150ms ease-out; }
 .anim-toast-in { animation: toast-in 200ms cubic-bezier(0.2, 0, 0, 1); }
 
+/* ---- Login: comanda de ingreso (design/login-drawer/02) ---- */
+
+.login-stage {
+  background:
+    repeating-linear-gradient(135deg, rgba(227, 217, 198, 0.35) 0 1px, transparent 1px 12px),
+    var(--color-papel);
+}
+
+.login-sheet-delay {
+  animation-delay: 140ms;
+  animation-fill-mode: backwards;
+}
+
+.login-scene {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-wordmark {
+  margin-top: 118px;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.login-tagline {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--color-tinta-suave);
+}
+
+.login-lamp {
+  position: absolute;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.login-lamp i {
+  display: block;
+}
+.login-lamp-cord {
+  width: 2px;
+  background: var(--color-tinta-suave);
+  opacity: 0.7;
+}
+.login-lamp-shade {
+  width: 52px;
+  height: 24px;
+  border-radius: 52px 52px 0 0;
+  background: var(--color-tinta);
+  position: relative;
+  z-index: 2;
+}
+.login-lamp-glow {
+  width: 120px;
+  height: 84px;
+  margin-top: -6px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(207, 196, 172, 0.55), transparent 68%);
+  z-index: 1;
+}
+.login-lamp-a {
+  left: 10%;
+}
+.login-lamp-a .login-lamp-cord {
+  height: 42px;
+}
+.login-lamp-b {
+  right: 8%;
+}
+.login-lamp-b .login-lamp-cord {
+  height: 80px;
+}
+.login-lamp-b .login-lamp-shade {
+  background: var(--color-rojo);
+  opacity: 0.92;
+}
+
+.login-shelf {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 20px;
+}
+.login-bottle {
+  width: 26px;
+  border: 1.5px solid var(--color-hair-fuerte);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  position: relative;
+  background: var(--color-crema);
+}
+.login-bottle::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 13px;
+  background: inherit;
+  border: 1.5px solid var(--color-hair-fuerte);
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+}
+.login-bottle-1 {
+  height: 74px;
+}
+.login-bottle-2 {
+  height: 100px;
+  background: var(--color-carta);
+}
+.login-bottle-3 {
+  height: 54px;
+}
+.login-bottle-4 {
+  height: 88px;
+  background: var(--color-rojo);
+  border-color: var(--color-rojo);
+  opacity: 0.88;
+}
+.login-bottle-4::before {
+  border-color: var(--color-rojo);
+}
+.login-bottle-5 {
+  height: 64px;
+  background: var(--color-carta);
+}
+.login-bottle-6 {
+  height: 82px;
+}
+
+.login-scallop {
+  height: 10px;
+  margin: 0 -28px;
+  background: radial-gradient(circle at 8px 0, transparent 6px, var(--color-carta) 6.5px);
+  background-size: 16px 10px;
+  background-repeat: repeat-x;
+}
+
+.login-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-hair-fuerte);
+  margin: 8px auto 14px;
+}
+
+.login-ticket-title {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.login-ticket-num {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-tinta-suave);
+}
+
+.login-ticket-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-tinta-suave);
+  margin-top: 4px;
+}
+
+.login-cut {
+  position: relative;
+  border-top: 2px dashed var(--color-hair-fuerte);
+  margin: 16px 0 18px;
+}
+.login-cut span {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-carta);
+  padding: 0 10px;
+  font-size: 12px;
+  color: var(--color-hair-fuerte);
+}
+
+.login-barcode {
+  margin-top: 20px;
+  height: 32px;
+  background: repeating-linear-gradient(90deg, var(--color-tinta) 0 2px, transparent 2px 5px, var(--color-tinta) 5px 6px, transparent 6px 10px);
+  opacity: 0.85;
+}
+
+.login-barcode-cap {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--color-tinta-suave);
+  margin-top: 6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
