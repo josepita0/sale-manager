@@ -38,7 +38,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ### Crear usuarios desde la app (admin)
 
-Una vez desplegada la función, el rol `admin` ve la pestaña **Usuarios**, donde carga email, nombre, rol y una contraseña inicial. El usuario nace **autoconfirmado**: sin email de verificación, puede entrar con su contraseña al instante (después puede cambiarla desde su sesión). La función valida que el que pide sea `admin` y asigna el rol con la clave de servicio: la metadata de registro nunca define roles.
+Una vez desplegada la función, el rol `admin` ve la pestaña **Usuarios**, donde carga email, nombre, rol y una contraseña inicial. El usuario nace **autoconfirmado**: sin email de verificación, puede entrar con su contraseña al instante. La función valida que el que pide sea `admin` y asigna el rol con la clave de servicio: la metadata de registro nunca define roles.
 
 ## Frontend
 
