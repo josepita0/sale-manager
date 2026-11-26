@@ -81,6 +81,13 @@ La clave `publishable` que usa el frontend es pública por diseño: viaja en el 
 
 [MIT](LICENSE)
 
+## Privacidad y protección de datos
+
+El aviso de privacidad del sistema (datos tratados, acceso por rol, proveedores,
+retención, cookies y almacenamiento) vive en [`docs/privacidad.md`](docs/privacidad.md):
+completá los campos `[CORCHETES]` con los datos del local antes de publicarlo o
+distribuirlo al personal.
+
 ## Modelo de datos
 
 - `profiles` — usuario, nombre y rol (`admin` / `manager` / `bartender`, enum de la base); se crea sola al crear el usuario.
