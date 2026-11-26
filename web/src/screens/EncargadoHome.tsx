@@ -34,7 +34,7 @@ export function EncargadoHome({ profile }: { profile: Profile }) {
         {tab === 'productos' && <ProductsTab />}
         {tab === 'turnos' && <HistoryTab />}
         {tab === 'clientes' && <VipCustomersTab />}
-        {isAdmin && tab === 'usuarios' && <UsersTab />}
+        {isAdmin && tab === 'usuarios' && <UsersTab profile={profile} />}
       </div>
       <BottomBar items={items} active={tab} onSelect={(key) => setTab(key as Tab)} />
     </div>

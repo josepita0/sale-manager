@@ -5,3 +5,4 @@ dist/
 .atl/
 .DS_Store
 *.log
+supabase/.temp/
