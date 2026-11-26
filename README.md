@@ -5,6 +5,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 ## Funcionalidades
 
 - Registro táctil de ventas y cortesías durante el turno (botón abrir/cerrar). La cortesía se decide por venta, con el modo Venta/Cortesía: cualquier producto puede regalarse.
+- **Precio especial por venta:** en la comanda (o una cuenta abierta), "Cambiar precio" aplica un descuento puntual a ese grupo (solo bajar; gratis sigue siendo cortesía). El reporte lo separa como "Descuentos por precio".
 - La pantalla de turno es una grilla a pantalla completa con un **ticket flotante** (comanda): lo tocado queda pendiente, agrupado por producto, y se registra por lote limpiando la comanda.
 - **Cuentas abiertas:** desde la comanda se puede abrir una cuenta con nombre libre o cliente VIP; mientras está activa, los taps de la grilla se anotan en esa cuenta en paralelo a la comanda suelta. Cada cuenta se registra y cierra por separado.
 - Reporte al cerrar: cantidades por producto, subtotal, total recaudado y valor regalado en cortesías.
@@ -93,7 +94,7 @@ distribuirlo al personal.
 - `profiles` — usuario, nombre y rol (`admin` / `manager` / `bartender`, enum de la base); se crea sola al crear el usuario.
 - `products` — catálogo: nombre, precio, activo. Vender o regalar se decide por venta, no por producto.
 - `shifts` — turno: bartender, inicio, fin, estado. Un solo turno abierto por bartender (índice único parcial).
-- `sales` — cada venta/cortesía: turno, producto, cantidad, **precio al momento** (snapshot), fecha, y opcionalmente la cuenta (`account_id`) en la que se anotó.
+- `sales` — cada venta/cortesía: turno, producto, cantidad, **precio al momento** (snapshot), opcionalmente un **precio acordado** (`price_override`, solo descuento, para esa venta puntual), fecha, y opcionalmente la cuenta (`account_id`) en la que se anotó.
 - `accounts` — cuentas abiertas dentro de un turno: nombre (libre o del cliente VIP), cliente VIP opcional, estado (`open` / `closed`) y fecha de apertura.
 
 La seguridad vive en la base: el bartender solo ve y toca su propio turno abierto; el encargado administra productos y ve todo el historial.
