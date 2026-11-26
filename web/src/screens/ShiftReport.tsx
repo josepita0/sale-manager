@@ -73,6 +73,11 @@ export function ShiftReport({ shiftId }: Props) {
                   </td>
                   <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta-suave">
                     {formatMoney(line.unitPrice)}
+                    {line.catalogUnitPrice != null && line.catalogUnitPrice !== line.unitPrice && (
+                      <span className="mt-0.5 block text-[10px] line-through opacity-70">
+                        {formatMoney(line.catalogUnitPrice)}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2 pl-2 text-right font-mono tabular-nums text-tinta">
                     {formatMoney(line.subtotal)}
@@ -93,6 +98,50 @@ export function ShiftReport({ shiftId }: Props) {
           </table>
         )}
       </section>
+
+      {report.adjusted.length > 0 && (
+        <section className="mt-5">
+          <SectionLabel>Descuentos por precio</SectionLabel>
+          <table className="mt-1 w-full text-sm">
+            <thead>
+              <tr className="text-left text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase">
+                <th className="py-1.5 pr-2 font-semibold">Producto</th>
+                <th className="px-1.5 py-1.5 text-right font-semibold">Cant.</th>
+                <th className="py-1.5 pl-2 text-right font-semibold">Descuento</th>
+              </tr>
+            </thead>
+            <tbody>
+              {report.adjusted.map((line) => (
+                <tr key={line.productId} className="border-b border-dashed border-hair">
+                  <td className="py-2 pr-2 font-semibold text-tinta">
+                    {line.name}
+                    <span className="mt-0.5 block text-[11px] font-normal text-tinta-suave">
+                      × {line.quantity} a {formatMoney(line.effectiveUnitPrice)} · carta{' '}
+                      {formatMoney(line.catalogUnitPrice)}
+                    </span>
+                  </td>
+                  <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta">
+                    × {line.quantity}
+                  </td>
+                  <td className="py-2 pl-2 text-right font-mono tabular-nums text-rojo">
+                    − {formatMoney(line.discount)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="border-t-2 border-solid border-tinta">
+                <td className="py-2.5 font-bold text-tinta" colSpan={2}>
+                  Total descuentos por precio
+                </td>
+                <td className="py-2.5 text-right font-mono font-bold tabular-nums text-rojo">
+                  − {formatMoney(report.discountTotal)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+      )}
 
       <section className="mt-5">
         <SectionLabel>Cortesías</SectionLabel>

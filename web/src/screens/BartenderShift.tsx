@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { buildShiftReport } from '../lib/report'
 import {
+  editLinePrice,
   enqueueLine,
   lineAmount,
   linesForAccount,
@@ -10,6 +11,7 @@ import {
   pendingCount,
   readTicket,
   ticketStorageKey,
+  validatePriceOverride,
   visibleSales,
   writeTicket,
   type TicketLine,
@@ -31,7 +33,12 @@ interface Props {
 }
 
 type InnerTab = 'turno' | 'reporte'
-type SheetView = { type: 'comanda' } | { type: 'abrir-cuenta' } | { type: 'account'; accountId: string } | null
+type SheetView =
+  | { type: 'comanda' }
+  | { type: 'abrir-cuenta' }
+  | { type: 'account'; accountId: string }
+  | { type: 'precio'; key: string; returnTo: { type: 'comanda' } | { type: 'account'; accountId: string } }
+  | null
 
 function safeStorage(): Storage | null {
   if (typeof window === 'undefined') return null
@@ -70,7 +77,15 @@ function TotalsStrip({ collected, invitations, sales }: { collected: number; inv
   )
 }
 
-function TicketRow({ line, onRemove }: { line: TicketLine; onRemove?: () => void }) {
+function TicketRow({
+  line,
+  onRemove,
+  onEditPrice,
+}: {
+  line: TicketLine
+  onRemove?: () => void
+  onEditPrice?: () => void
+}) {
   return (
     <div className="anim-line-in flex items-baseline gap-2 border-b border-dashed border-hair py-2">
       <span className="text-[13.5px] font-semibold text-tinta">
@@ -82,8 +97,29 @@ function TicketRow({ line, onRemove }: { line: TicketLine; onRemove?: () => void
       </span>
       <span className="flex-1 -translate-y-1 border-b-2 border-dotted border-hair-fuerte" aria-hidden="true" />
       <span className="font-mono text-[13px] tabular-nums text-tinta">
-        {line.is_invitation ? '—' : formatMoney(lineAmount(line))}
+        {line.is_invitation ? (
+          '—'
+        ) : (
+          <>
+            {formatMoney(lineAmount(line))}
+            {line.priceOverride != null && (
+              <span className="mt-0.5 block text-[10px] font-normal text-tinta-suave">
+                antes {formatMoney(line.price)}
+              </span>
+            )}
+          </>
+        )}
       </span>
+      {onEditPrice && !line.is_invitation && (
+        <button
+          type="button"
+          onClick={onEditPrice}
+          aria-label={`Cambiar precio de ${line.name}`}
+          className="relative ml-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-hair-fuerte text-[11px] font-bold text-tinta-suave before:absolute before:-inset-1.5 before:rounded-lg before:content-['']"
+        >
+          €
+        </button>
+      )}
       {onRemove && (
         <button
           type="button"
@@ -95,6 +131,71 @@ function TicketRow({ line, onRemove }: { line: TicketLine; onRemove?: () => void
         </button>
       )}
     </div>
+  )
+}
+
+/** Editor of one pending group's price: discounts only, validated in lib/comanda. */
+function PriceEditorSheet({
+  line,
+  onClose,
+  onSave,
+}: {
+  line: TicketLine
+  onClose: () => void
+  onSave: (price: number) => void
+}) {
+  const [raw, setRaw] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  return (
+    <Sheet
+      open
+      title="Cambiar precio"
+      heading={line.name}
+      subtitle={`Precio de carta: ${formatMoney(line.price)}`}
+      onClose={onClose}
+    >
+      <form
+        onSubmit={(e) => {
+          e.preventDefault()
+          const result = validatePriceOverride(line.price, raw)
+          if (result.price === null) {
+            setError(result.error)
+            return
+          }
+          onSave(result.price)
+        }}
+      >
+        <label className="mb-3 block text-sm">
+          <span className="mb-1 block text-xs text-tinta-suave">Nuevo precio (solo bajar)</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            autoFocus
+            value={raw}
+            onChange={(e) => {
+              setRaw(e.target.value)
+              setError(null)
+            }}
+            placeholder="0,00"
+            className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
+          />
+          {error && <span className="mt-1 block text-xs text-rojo">{error}</span>}
+        </label>
+        <button
+          type="submit"
+          className="min-h-12 w-full rounded-lg bg-tinta text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity"
+        >
+          Guardar precio
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-2.5 min-h-12 w-full rounded-lg border-[1.5px] border-tinta text-xs font-semibold tracking-[0.05em] text-tinta uppercase"
+        >
+          Volver
+        </button>
+      </form>
+    </Sheet>
   )
 }
 
@@ -258,6 +359,7 @@ export function BartenderShift({ profile, embedded = false }: Props) {
           product_id: line.productId,
           quantity: line.qty,
           unit_price: line.price,
+          price_override: line.priceOverride ?? null,
           is_invitation: line.is_invitation,
           vip_customer_id: line.vipCustomerId ?? fallbackVipId,
           account_id: accountId,
@@ -702,7 +804,12 @@ export function BartenderShift({ profile, embedded = false }: Props) {
         }
       >
         {loose.map((line) => (
-          <TicketRow key={line.key} line={line} onRemove={() => removePendingLine(line)} />
+          <TicketRow
+            key={line.key}
+            line={line}
+            onRemove={() => removePendingLine(line)}
+            onEditPrice={() => setSheet({ type: 'precio', key: line.key, returnTo: { type: 'comanda' } })}
+          />
         ))}
 
         {loose.length > 0 && (
@@ -883,7 +990,15 @@ export function BartenderShift({ profile, embedded = false }: Props) {
                     Comanda vacía — tocá un producto para anotarla en esta cuenta.
                   </p>
                 ) : (
-                  accountLines.map((line) => <TicketRow key={line.key} line={line} />)
+                  accountLines.map((line) => (
+                    <TicketRow
+                      key={line.key}
+                      line={line}
+                      onEditPrice={() =>
+                        setSheet({ type: 'precio', key: line.key, returnTo: { type: 'account', accountId: sheetAccount.id } })
+                      }
+                    />
+                  ))
                 )}
                 {accountLines.length > 0 && (
                   <div className="flex justify-between pt-2.5 text-sm font-bold text-tinta">
@@ -928,6 +1043,23 @@ export function BartenderShift({ profile, embedded = false }: Props) {
           </Sheet>
         )
       })()}
+
+      {sheet?.type === 'precio' &&
+        (() => {
+          const line = lines.find((candidate) => candidate.key === sheet.key)
+          if (!line) return null
+          return (
+            <PriceEditorSheet
+              line={line}
+              onClose={() => setSheet(sheet.returnTo)}
+              onSave={(price) => {
+                setLines((current) => editLinePrice(current, sheet.key, price))
+                setSheet(sheet.returnTo)
+                toast('Precio especial aplicado ✓')
+              }}
+            />
+          )
+        })()}
 
       <Sheet
         open={confirmingClose}

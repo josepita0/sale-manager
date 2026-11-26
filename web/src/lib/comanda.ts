@@ -10,6 +10,8 @@ export interface TicketLine {
   productId: string
   name: string
   price: number
+  /** Agreed price for this whole pending group (solo bajar); null = catalog price. */
+  priceOverride?: number | null
   is_invitation: boolean
   vipCustomerId: string | null
   accountId: string | null
@@ -42,9 +44,34 @@ export function enqueueLine(lines: TicketLine[], item: NewTicketLine): TicketLin
   return [...lines, { ...item, key, qty: 1 }]
 }
 
-/** Money of one pending line; cortesías are worth 0. */
+/** Money of one pending line; cortesías are worth 0 and overrides pin the price. */
 export function lineAmount(line: TicketLine): number {
-  return line.is_invitation ? 0 : line.price * line.qty
+  if (line.is_invitation) return 0
+  return (line.priceOverride ?? line.price) * line.qty
+}
+
+/**
+ * Validates an edited price for a pending group: discounts only, never free
+ * (free is the cortesía flow) and never at or above the catalog price.
+ */
+export function validatePriceOverride(
+  catalogPrice: number,
+  raw: string,
+): { price: number; error: null } | { price: null; error: string } {
+  const cleaned = raw.trim().replace(',', '.')
+  if (!cleaned) return { price: null, error: 'Ingresá el nuevo precio.' }
+  const price = Number(cleaned)
+  if (!Number.isFinite(price)) return { price: null, error: 'El precio no es válido.' }
+  if (price <= 0) return { price: null, error: 'El precio debe ser mayor a 0: regalar es cortesía.' }
+  if (price >= catalogPrice) {
+    return { price: null, error: `Solo se puede bajar del precio de carta (${catalogPrice}).` }
+  }
+  return { price, error: null }
+}
+
+/** Sets (or clears with null) the price override of one pending group. */
+export function editLinePrice(lines: TicketLine[], key: string, priceOverride: number | null): TicketLine[] {
+  return lines.map((line) => (line.key === key ? { ...line, priceOverride } : line))
 }
 
 export function linesTotal(lines: TicketLine[]): number {
@@ -71,6 +98,7 @@ function isTicketLine(value: unknown): value is TicketLine {
     typeof line.productId === 'string' &&
     typeof line.name === 'string' &&
     typeof line.price === 'number' &&
+    (line.priceOverride === undefined || line.priceOverride === null || typeof line.priceOverride === 'number') &&
     typeof line.is_invitation === 'boolean' &&
     (typeof line.vipCustomerId === 'string' || line.vipCustomerId === null) &&
     (typeof line.accountId === 'string' || line.accountId === null) &&
@@ -89,7 +117,9 @@ export function parseTicket(raw: string | null): TicketLine[] {
   try {
     const parsed: unknown = JSON.parse(raw)
     if (!Array.isArray(parsed)) return []
-    return parsed.filter(isTicketLine)
+    return parsed
+      .filter(isTicketLine)
+      .map((line) => ({ ...line, priceOverride: line.priceOverride ?? null }))
   } catch {
     return []
   }

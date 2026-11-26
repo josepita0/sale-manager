@@ -42,6 +42,8 @@ export interface Sale {
   /** Snapshot taken at sale time; reports never read the product flag. */
   is_invitation: boolean
   vip_customer_id: string | null
+  /** Catalog price at insert time (audit reference). */
+  price_override: number | null
   /** Open account the sale was noted into; null for the loose comanda. */
   account_id: string | null
   created_at: string
