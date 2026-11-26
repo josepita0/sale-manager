@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { PasswordInput } from '../components/PasswordInput'
 
 export function Login() {
   const [email, setEmail] = useState('')
@@ -89,15 +90,13 @@ export function Login() {
             >
               Contraseña
             </label>
-            <input
+            <PasswordInput
               id="password"
-              type="password"
               required
               autoComplete="current-password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               placeholder="••••••••"
-              className="h-12 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta"
             />
           </div>
 
