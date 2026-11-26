@@ -128,3 +128,25 @@ export function MasIcon(props: IconProps) {
     </Svg>
   )
 }
+
+/** Ojo — mostrar contraseña. */
+export function OjoIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+      <circle cx="12" cy="12" r="3" />
+    </Svg>
+  )
+}
+
+/** Ojo tachado — ocultar contraseña. */
+export function OjoTachadoIcon(props: IconProps) {
+  return (
+    <Svg {...props}>
+      <path d="M4 4l16 16" />
+      <path d="M10.6 5.7c.5-.1 1-.2 1.4-.2 6 0 9.5 6.5 9.5 6.5a17.4 17.4 0 0 1-2.2 3" />
+      <path d="M6.4 6.9A16.7 16.7 0 0 0 2.5 12S6 18.5 12 18.5c1.3 0 2.5-.3 3.6-.7" />
+      <path d="M9.9 10.1a3 3 0 0 0 4.1 4.1" />
+    </Svg>
+  )
+}

@@ -7,6 +7,7 @@ import { toast } from '../components/Toast'
 import { validateNewUser, type NewUserErrors } from '../lib/newUser'
 import { validateEditUser, type EditUserErrors } from '../lib/editUser'
 import { ROLE_LABEL, type Profile, type Role } from '../lib/types'
+import { PasswordInput } from '../components/PasswordInput'
 
 /** Profile row with the creation date shown in the list. */
 interface StaffProfile extends Profile {
@@ -171,14 +172,12 @@ function UserForm({
         <label htmlFor="user-password" className={labelClass}>
           {editing ? 'Contraseña' : 'Contraseña inicial'}
         </label>
-        <input
+        <PasswordInput
           id="user-password"
-          type="password"
           autoComplete="new-password"
           placeholder={editing ? 'Dejar vacío para no cambiar' : undefined}
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={fieldClass}
+          onChange={setPassword}
         />
         {fieldErrors.password && <p className="mt-1 text-xs text-rojo">{fieldErrors.password}</p>}
         <p className="mt-1 text-[11px] text-tinta-suave">Mínimo 6 caracteres; compartila con el usuario.</p>

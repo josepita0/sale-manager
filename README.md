@@ -1,4 +1,4 @@
-# Naira's
+# La Barra
 
 Gestor ligero de ventas para la barra: el bartender registra los productos que vende y las cortesías ("invitaciones") de su turno, y al cerrarlo obtiene un reporte con cantidades por producto, dinero recaudado y cortesías aparte.
 

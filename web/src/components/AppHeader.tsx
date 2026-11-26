@@ -31,7 +31,7 @@ export function AppHeader({ profile, email, children }: Props) {
       <div className="mx-auto flex max-w-3xl items-center justify-between gap-3">
         <div>
           <p className="text-base font-extrabold tracking-[0.06em] text-tinta uppercase">
-            Naira's
+            La Barra
           </p>
           <p className="mt-0.5 text-xs text-tinta-suave">
             {ROLE_LABEL[profile.role]}

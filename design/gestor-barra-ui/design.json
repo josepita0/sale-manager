@@ -1,6 +1,6 @@
 {
   "title": "Rediseño Gestor de Barra",
-  "brief": "Rediseño visual completo de la app móvil (bartender + encargado) de la marca Naira's: navegación por bottom bar, alta de productos en drawer, acciones de cada ítem (editar/desactivar/eliminar) en bottom sheet desplegable. Moderno, sencillo, sin estética genérica de IA.",
+  "brief": "Rediseño visual completo de la app móvil (bartender + encargado) de la barra (marca genérica pendiente): navegación por bottom bar, alta de productos en drawer, acciones de cada ítem (editar/desactivar/eliminar) en bottom sheet desplegable. Moderno, sencillo, sin estética genérica de IA.",
   "feature": "odd/tasks/gestor-ventas.md",
   "artboards": [
     { "file": "01-tactil-oscura.html", "title": "Táctil de barra (oscuro)", "tradeoff": "Cómoda para luz baja y uso nocturno; menos legible a pleno sol", "width": 1290, "height": 940 },

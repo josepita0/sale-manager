@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — Drawer completo</title>
+<style>
+  :root{
+    --papel:#fbf7ef;--carta:#ffffff;--tinta:#231c12;--tinta-suave:#7a6f5c;
+    --hair:#e3d9c6;--hair-fuerte:#cfc4ac;--rojo:#b3402a;--crema:#efe8d9;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--papel);color:var(--tinta);-webkit-font-smoothing:antialiased;overflow:hidden}
+  .stage{position:relative;height:100vh;display:flex;flex-direction:column}
+
+  /* ---- Franja de marca ---- */
+  .scene{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;padding-top:34px;padding-bottom:26px}
+  .wordmark{font-size:34px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+  .tagline{margin-top:8px;font-size:13px;color:var(--tinta-suave)}
+
+  /* ---- Drawer completo ---- */
+  .sheet{position:fixed;left:0;right:0;bottom:0;top:132px;z-index:10;background:var(--carta);border-top:1px solid var(--hair);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(60,45,20,.14);padding:10px 24px 30px;animation:sheet-in 220ms cubic-bezier(.2,0,0,1) .14s backwards}
+  @keyframes sheet-in{from{transform:translateY(100%)}}
+  .handle{width:36px;height:4px;border-radius:999px;background:var(--hair-fuerte);margin:4px auto 18px}
+  .sheet h2{font-size:22px;font-weight:800;letter-spacing:.01em}
+  .sheet-sub{font-size:13px;color:var(--tinta-suave);margin-top:4px}
+
+  form{margin-top:24px;display:grid;gap:16px}
+  .micro{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);margin-bottom:6px}
+  input{height:48px;width:100%;border-radius:8px;border:1px solid var(--hair-fuerte);background:var(--papel);padding:0 14px;font-size:15px;color:var(--tinta);font-family:inherit}
+  input::placeholder{color:var(--tinta-suave);opacity:.7}
+  .error{border:1px solid rgba(179,64,42,.4);background:rgba(179,64,42,.05);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--rojo)}
+  .primary{height:48px;border:0;border-radius:8px;background:var(--tinta);color:var(--papel);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:inherit;cursor:pointer;margin-top:6px;transition:opacity 150ms ease}
+  .primary:hover{opacity:.9}
+  .primary:disabled{opacity:.5;cursor:default}
+  .footnote{margin-top:22px;text-align:center;font-size:12px;color:var(--tinta-suave)}
+  .footnote strong{color:var(--tinta);font-weight:600}
+
+  .demo{position:fixed;top:12px;right:12px;z-index:20;display:flex;gap:8px}
+  .demo button{font-family:inherit;font-size:11px;font-weight:600;padding:8px 12px;border-radius:999px;border:1px solid var(--hair-fuerte);background:var(--carta);color:var(--tinta);cursor:pointer}
+  .demo button[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+  :focus-visible{outline:2px solid var(--rojo);outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:1ms !important;transition-duration:1ms !important}
+  }
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="scene" aria-hidden="true">
+    <h1 class="wordmark">La Barra</h1>
+    <p class="tagline">Ventas y cortesías de tu turno</p>
+  </section>
+
+  <section class="sheet" role="dialog" aria-labelledby="login-h" id="sheet3">
+    <div class="handle" aria-hidden="true"></div>
+    <h2 id="login-h">Ingresá a tu turno</h2>
+    <p class="sheet-sub">El turno queda abierto a tu nombre al entrar</p>
+    <form>
+      <div>
+        <label class="micro" for="email3">Email</label>
+        <input id="email3" type="email" autocomplete="email" placeholder="vos@mibar.ar" required>
+      </div>
+      <div>
+        <label class="micro" for="pass3">Contraseña</label>
+        <input id="pass3" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+      <p id="form-error3" class="error" hidden>No pudimos iniciar sesión. Revisá el email y la contraseña.</p>
+      <button id="submit3" class="primary" type="submit">Iniciar sesión</button>
+    </form>
+    <p class="footnote">¿Problemas para entrar? Avisale al <strong>encargado</strong>.</p>
+  </section>
+
+  <div class="demo" aria-label="Controles de demostración">
+    <button type="button" id="replay3">↻ Reproducir</button>
+    <button type="button" id="err3" aria-pressed="false">Error</button>
+    <button type="button" id="load3" aria-pressed="false">Cargando</button>
+  </div>
+</main>
+<script>
+  var sheet=document.getElementById('sheet3');
+  document.getElementById('replay3').addEventListener('click',function(){
+    sheet.style.animation='none';void sheet.offsetHeight;sheet.style.animation='';
+  });
+  var err=document.getElementById('form-error3'),errBtn=document.getElementById('err3');
+  errBtn.addEventListener('click',function(){
+    var on=err.hasAttribute('hidden');
+    if(on){err.removeAttribute('hidden')}else{err.setAttribute('hidden','')}
+    errBtn.setAttribute('aria-pressed',String(on));
+  });
+  var btn=document.getElementById('submit3'),loadBtn=document.getElementById('load3');
+  loadBtn.addEventListener('click',function(){
+    var on=btn.disabled;
+    btn.disabled=!on;
+    btn.textContent=!on?'Ingresando…':'Iniciar sesión';
+    loadBtn.setAttribute('aria-pressed',String(!on));
+  });
+  document.querySelector('form').addEventListener('submit',function(e){e.preventDefault()});
+</script>
+</body>
+</html>

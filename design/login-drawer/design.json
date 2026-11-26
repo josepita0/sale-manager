@@ -1,0 +1,27 @@
+{
+  "title": "Login como drawer inferior",
+  "brief": "Rediseño del login (nombre de marca pendiente de definir con la clienta; se usa 'La Barra' como genérico): la card se convierte en un drawer que sube desde abajo, coherente con el interior claro de la app (papel/tinta) y con su patrón nativo de sheets (sheet-in 220ms).",
+  "artboards": [
+    {
+      "file": "01-escena-papel.html",
+      "title": "Escena de papel — half sheet",
+      "tradeoff": "Momento de marca con estantería ilustrada detrás del drawer; deja menos espacio vertical al formulario en pantallas chicas",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "02-comanda-ticket.html",
+      "title": "Comanda de ingreso — ticket",
+      "tradeoff": "Mucha personalidad: ticket sin marca dentro, con escena de barra detrás (lámparas colgantes, botellas, textido de rayas) usando solo tokens del sistema; el lenguaje de ticket puede robarle atención al formulario",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "file": "03-drawer-completo.html",
+      "title": "Drawer completo — franja de marca",
+      "tradeoff": "La opción más calma y usable, calcada del patrón de sheets de la app; la escena de marca queda reducida a una franja superior",
+      "width": 390,
+      "height": 844
+    }
+  ]
+}
