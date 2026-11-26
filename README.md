@@ -16,7 +16,7 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
 
 ## Setup de Supabase (una sola vez)
 
-1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0006): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
+1. **Esquema:** Entrá al [dashboard de Supabase](https://supabase.com/dashboard) → tu proyecto → **SQL Editor** → New query. Ejecutá los archivos de `supabase/migrations/` **en orden numérico** (0001 a 0007): pegá el contenido de cada uno y ejecutalo con **Run**. Crea las tablas, la seguridad (RLS) y un catálogo de ejemplo.
 2. **Usuarios:** **Authentication → Users → Add user → Create new user**. Cargá email + contraseña y marcá *Auto Confirm User*. Creá así la cuenta del bartender y la del encargado.
 3. **Promover al encargado:** en **SQL Editor** ejecutá (reemplazá el email):
 
@@ -27,7 +27,18 @@ Gestor ligero de ventas para la barra: el bartender registra los productos que v
    ```
 
    Toda cuenta nueva arranca como `bartender`; el rol de encargado nunca sale del registro público. Los roles son un enum de la base: `admin`, `manager`, `bartender`.
-4. **Cerrar el registro público (recomendado):** **Authentication → Sign In / Providers → Email** → desactivá **Allow new users to sign up**. Las cuentas se crean solo desde el dashboard.
+4. **Desplegar la Edge Function de alta de usuarios:** con el [CLI de Supabase](https://supabase.com/docs/guides/cli) logueado y linkeado al proyecto:
+
+   ```bash
+   npx supabase functions deploy create-user
+   ```
+
+   La función usa la clave `service_role` **dentro del servidor de Supabase** (nunca viaja al navegador) y deja que un `admin` cree usuarios desde la app, ya confirmados y sin mandar ningún email.
+5. **Cerrar el registro público (recomendado):** **Authentication → Sign In / Providers → Email** → desactivá **Allow new users to sign up**. Las cuentas se crean solo desde el dashboard o desde la pestaña **Usuarios** del admin.
+
+### Crear usuarios desde la app (admin)
+
+Una vez desplegada la función, el rol `admin` ve la pestaña **Usuarios**, donde carga email, nombre, rol y una contraseña inicial. El usuario nace **autoconfirmado**: sin email de verificación, puede entrar con su contraseña al instante (después puede cambiarla desde su sesión).
 
 ## Frontend
 
@@ -61,7 +72,7 @@ El frontend se puede publicar en Vercel o Netlify (gratis): root del proyecto `w
 
 ## Seguridad
 
-La clave `publishable` que usa el frontend es pública por diseño: viaja en el bundle de cualquier app que se conecte a Supabase. La protección real está en las políticas **RLS** de la base. Nunca subas ni expongas la clave `service_role` (acceso total sin RLS), y mantené el registro público de usuarios deshabilitado.
+La clave `publishable` que usa el frontend es pública por diseño: viaja en el bundle de cualquier app que se conecta a Supabase. La protección real está en las políticas **RLS** de la base. Nunca subas ni expongas la clave `service_role` (acceso total sin RLS), y mantené el registro público de usuarios deshabilitado. La Edge Function `create-user` es el único punto que toca la `service_role`: vive del lado de Supabase, valida que el que pide sea `admin` y rechaza cualquier otra sesión.
 
 ## Licencia
 
