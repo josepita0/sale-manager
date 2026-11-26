@@ -7,8 +7,10 @@
 //   2. validates the payload (email, full_name, role, password);
 //   3. creates the user with the Auth Admin API and `email_confirm: true`,
 //      so no confirmation email is ever sent — the user can sign in
-//      immediately with the email + password the admin chose.
-// The signup trigger (0007) turns user_metadata into the profile row.
+//      immediately with the email + password the admin chose;
+//   4. assigns the requested role with the service client. Roles never
+//      travel in signup metadata: public signup must not be able to
+//      claim one (0007 keeps every new account as bartender).
 //
 // Deploy: `supabase functions deploy create-user`
 
@@ -84,12 +86,14 @@ Deno.serve(async (req) => {
       return json(400, { error: 'La contraseña debe tener al menos 6 caracteres.' })
     }
 
-    // 3) Create the user already confirmed: no email is sent.
+    // 3) Create the user already confirmed: no email is sent. Only
+    //    full_name goes in metadata (the trigger reads it); the role is
+    //    granted server-side afterwards.
     const { data: created, error: createError } = await admin.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
-      user_metadata: { full_name: fullName, role },
+      user_metadata: { full_name: fullName },
     })
     if (createError) {
       const duplicated =
@@ -102,6 +106,16 @@ Deno.serve(async (req) => {
     }
     const createdId = created.user?.id
     if (!createdId) return json(500, { error: 'El usuario se creó pero no se pudo confirmar.' })
+
+    // 4) Grant the role server-side; the signup trigger always creates
+    //    the profile as bartender.
+    const { error: roleError } = await admin
+      .from('profiles')
+      .update({ role })
+      .eq('id', createdId)
+    if (roleError) {
+      return json(500, { error: 'El usuario se creó pero no se le pudo asignar el rol.' })
+    }
 
     // The trigger builds the profile; return it so the UI can show it.
     const { data: profile, error: profileError } = await admin

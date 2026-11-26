@@ -22,6 +22,11 @@ describe('validateNewUser', () => {
     expect(validateNewUser({ ...VALID, email: 'ana-sin-arroba' }).email).toBeTruthy()
   })
 
+  it('rejects an email without dot-domain or with an inner space', () => {
+    expect(validateNewUser({ ...VALID, email: 'a@b' }).email).toBeTruthy()
+    expect(validateNewUser({ ...VALID, email: 'a b@c.co' }).email).toBeTruthy()
+  })
+
   it('requires the full name', () => {
     expect(validateNewUser({ ...VALID, fullName: '   ' }).fullName).toBeTruthy()
   })
@@ -31,8 +36,14 @@ describe('validateNewUser', () => {
     expect(validateNewUser({ ...VALID, role: 'dueno' as Role }).role).toBeTruthy()
   })
 
-  it('requires a password of at least 6 characters', () => {
+  it('rejects uppercase and legacy role names', () => {
+    expect(validateNewUser({ ...VALID, role: 'ADMIN' as Role }).role).toBeTruthy()
+    expect(validateNewUser({ ...VALID, role: 'encargado' as Role }).role).toBeTruthy()
+  })
+
+  it('requires a password of at least 6 characters (raw length, like the server)', () => {
     expect(validateNewUser({ ...VALID, password: '12345' }).password).toBeTruthy()
     expect(validateNewUser({ ...VALID, password: '123456' }).password).toBeUndefined()
+    expect(validateNewUser({ ...VALID, password: ' 1234 ' }).password).toBeUndefined()
   })
 })
