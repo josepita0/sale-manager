@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "chosen": "02-comanda-ticket.html",
+  "handoffs": {
+    "02-comanda-ticket.html": {
+      "status": "implemented",
+      "queued": false,
+      "sentAt": "2026-11-26T13:05:14.874Z",
+      "startedAt": "2026-11-26T13:05:16.711Z",
+      "implementedAt": "2026-11-26T13:06:22.262Z",
+      "note": "Comanda de ingreso implementada: drawer con sheet-in 220ms + delay 140ms (fill backwards), error con panel-in, botón con transición de opacidad, prefers-reduced-motion heredado. Escena de barra (lámparas, botellas, rayas) solo con tokens del sistema. Build y 43 tests en verde.",
+      "previewUrl": "http://localhost:5173/"
+    }
+  }
+}

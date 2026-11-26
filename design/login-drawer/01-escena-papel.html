@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — Escena de papel</title>
+<style>
+  :root{
+    --papel:#fbf7ef;--carta:#ffffff;--tinta:#231c12;--tinta-suave:#7a6f5c;
+    --hair:#e3d9c6;--hair-fuerte:#cfc4ac;--rojo:#b3402a;--crema:#efe8d9;
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--papel);color:var(--tinta);-webkit-font-smoothing:antialiased;overflow:hidden}
+  .stage{position:relative;height:100vh;display:flex;flex-direction:column}
+
+  /* ---- Escena de marca ---- */
+  .scene{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;padding-top:72px}
+  .wordmark{font-size:54px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+  .tagline{margin-top:12px;font-size:14px;color:var(--tinta-suave)}
+  .shelf{position:absolute;bottom:0;left:0;right:0;display:flex;align-items:flex-end;justify-content:center;gap:20px}
+  .b{width:26px;border:1.5px solid var(--hair-fuerte);border-bottom:0;border-radius:10px 10px 0 0;position:relative;background:var(--crema)}
+  .b::before{content:"";position:absolute;top:-13px;left:50%;transform:translateX(-50%);width:8px;height:13px;background:inherit;border:1.5px solid var(--hair-fuerte);border-bottom:0;border-radius:3px 3px 0 0}
+  .b1{height:78px}
+  .b2{height:106px;background:var(--carta)}
+  .b3{height:58px}
+  .b4{height:92px;background:var(--rojo);border-color:var(--rojo);opacity:.88}
+  .b4::before{border-color:var(--rojo)}
+  .b5{height:68px;background:var(--carta)}
+  .b6{height:88px}
+
+  /* ---- Drawer ---- */
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:10;background:var(--carta);border-top:1px solid var(--hair);border-radius:20px 20px 0 0;box-shadow:0 -8px 30px rgba(60,45,20,.14);padding:10px 24px 30px;animation:sheet-in 220ms cubic-bezier(.2,0,0,1) .14s backwards}
+  @keyframes sheet-in{from{transform:translateY(100%)}}
+  .handle{width:36px;height:4px;border-radius:999px;background:var(--hair-fuerte);margin:4px auto 16px}
+  .sheet h2{font-size:18px;font-weight:800}
+  .sheet-sub{font-size:13px;color:var(--tinta-suave);margin-top:2px}
+
+  form{margin-top:18px;display:grid;gap:14px}
+  .micro{display:block;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta-suave);margin-bottom:6px}
+  input{height:48px;width:100%;border-radius:8px;border:1px solid var(--hair-fuerte);background:var(--papel);padding:0 14px;font-size:15px;color:var(--tinta);font-family:inherit}
+  input::placeholder{color:var(--tinta-suave);opacity:.7}
+  .error{border:1px solid rgba(179,64,42,.4);background:rgba(179,64,42,.05);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--rojo)}
+  .primary{height:48px;border:0;border-radius:8px;background:var(--tinta);color:var(--papel);font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:inherit;cursor:pointer;margin-top:4px;transition:opacity 150ms ease}
+  .primary:hover{opacity:.9}
+  .primary:disabled{opacity:.5;cursor:default}
+
+  /* ---- Controles de demo (solo artboard) ---- */
+  .demo{position:fixed;top:12px;right:12px;z-index:20;display:flex;gap:8px}
+  .demo button{font-family:inherit;font-size:11px;font-weight:600;padding:8px 12px;border-radius:999px;border:1px solid var(--hair-fuerte);background:var(--carta);color:var(--tinta);cursor:pointer}
+  .demo button[aria-pressed="true"]{background:var(--tinta);color:var(--papel)}
+  :focus-visible{outline:2px solid var(--rojo);outline-offset:2px}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation-duration:1ms !important;transition-duration:1ms !important}
+  }
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="scene" aria-hidden="true">
+    <h1 class="wordmark">Naira's</h1>
+    <p class="tagline">Ventas y cortesías de tu turno</p>
+    <div class="shelf">
+      <div class="b b1"></div><div class="b b2"></div><div class="b b3"></div>
+      <div class="b b4"></div><div class="b b5"></div><div class="b b6"></div>
+    </div>
+  </section>
+
+  <section class="sheet" role="dialog" aria-labelledby="login-h">
+    <div class="handle" aria-hidden="true"></div>
+    <h2 id="login-h">Ingresá</h2>
+    <p class="sheet-sub">Con tu cuenta del bar</p>
+    <form>
+      <div>
+        <label class="micro" for="email1">Email</label>
+        <input id="email1" type="email" autocomplete="email" placeholder="vos@nairas.bar" required>
+      </div>
+      <div>
+        <label class="micro" for="pass1">Contraseña</label>
+        <input id="pass1" type="password" autocomplete="current-password" placeholder="••••••••" required>
+      </div>
+      <p id="form-error1" class="error" hidden>No pudimos iniciar sesión. Revisá el email y la contraseña.</p>
+      <button id="submit1" class="primary" type="submit">Iniciar sesión</button>
+    </form>
+  </section>
+
+  <div class="demo" aria-label="Controles de demostración">
+    <button type="button" id="replay1">↻ Reproducir</button>
+    <button type="button" id="err1" aria-pressed="false">Error</button>
+    <button type="button" id="load1" aria-pressed="false">Cargando</button>
+  </div>
+</main>
+<script>
+  var sheet=document.getElementById('sheet1')||document.querySelector('.sheet');
+  document.getElementById('replay1').addEventListener('click',function(){
+    sheet.style.animation='none';void sheet.offsetHeight;sheet.style.animation='';
+  });
+  var err=document.getElementById('form-error1'),errBtn=document.getElementById('err1');
+  errBtn.addEventListener('click',function(){
+    var on=err.hasAttribute('hidden');
+    if(on){err.removeAttribute('hidden')}else{err.setAttribute('hidden','')}
+    errBtn.setAttribute('aria-pressed',String(on));
+  });
+  var btn=document.getElementById('submit1'),loadBtn=document.getElementById('load1');
+  loadBtn.addEventListener('click',function(){
+    var on=btn.disabled;
+    btn.disabled=!on;
+    btn.textContent=!on?'Ingresando…':'Iniciar sesión';
+    loadBtn.setAttribute('aria-pressed',String(!on));
+  });
+  document.querySelector('form').addEventListener('submit',function(e){e.preventDefault()});
+</script>
+</body>
+</html>
