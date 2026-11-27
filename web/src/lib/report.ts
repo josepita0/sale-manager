@@ -1,4 +1,4 @@
-import type { SaleWithProduct } from './types'
+import type { Account, SaleWithProduct } from './types'
 
 export interface ReportLine {
   productId: string
@@ -36,6 +36,67 @@ export interface AdjustedLine {
   effectiveUnitPrice: number
   /** (catalogUnitPrice - effectiveUnitPrice) x quantity, always > 0. */
   discount: number
+}
+
+/** One account's sales in the shift: the per-person report breakdown. */
+export interface AccountReport {
+  accountId: string
+  accountName: string
+  /** Product lines sold into the account, biggest subtotal first. */
+  lines: ReportLine[]
+  /** Money of the account at effective prices, cortesías valued as gifted. */
+  subtotal: number
+}
+
+/**
+ * Per-account breakdown of a shift's sales: which person was sold
+ * which specific products. Loose comanda sales (account_id null) and
+ * accounts without sales never appear. Cortesías keep their list price;
+ * a sold line's override pins its price and keeps the catalog snapshot
+ * for the strikethrough, matching the shift report's semantics.
+ */
+export function buildAccountReport(
+  sales: SaleWithProduct[],
+  accounts: Pick<Account, 'id' | 'name'>[],
+): AccountReport[] {
+  const names = new Map(accounts.map((a) => [a.id, a.name]))
+  const byAccount = new Map<string, Map<string, ReportLine>>()
+
+  for (const sale of sales) {
+    if (sale.account_id === null) continue
+    let lines = byAccount.get(sale.account_id)
+    if (!lines) {
+      lines = new Map()
+      byAccount.set(sale.account_id, lines)
+    }
+    const effective = sale.is_invitation ? sale.unit_price : (sale.price_override ?? sale.unit_price)
+    const line = lines.get(sale.product_id) ?? {
+      productId: sale.product_id,
+      name: sale.products.name,
+      quantity: 0,
+      unitPrice: effective,
+      subtotal: 0,
+    }
+    line.quantity += sale.quantity
+    line.subtotal += sale.quantity * effective
+    line.unitPrice = effective
+    if (!sale.is_invitation && sale.price_override !== null) {
+      line.catalogUnitPrice = sale.unit_price
+    }
+    lines.set(sale.product_id, line)
+  }
+
+  return [...byAccount.entries()]
+    .map(([accountId, lines]) => {
+      const sorted = [...lines.values()].sort((a, b) => b.subtotal - a.subtotal)
+      return {
+        accountId,
+        accountName: names.get(accountId) ?? 'Cuenta',
+        lines: sorted,
+        subtotal: sorted.reduce((acc, l) => acc + l.subtotal, 0),
+      }
+    })
+    .sort((a, b) => b.subtotal - a.subtotal)
 }
 
 /**

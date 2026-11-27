@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { buildShiftReport } from '../lib/report'
+import { buildAccountReport, buildShiftReport } from '../lib/report'
 import { formatDateTime, formatMoney } from '../lib/format'
 import { SectionLabel } from '../components/ScreenHead'
 import { ReportHeaderSkeleton } from './skeleton'
@@ -21,7 +21,7 @@ export function ShiftReport({ shiftId }: Props) {
     setError(null)
     supabase
       .from('shifts')
-      .select('*, profiles(full_name), sales(*, products(name, price))')
+      .select('*, profiles(full_name), sales(*, products(name, price)), accounts(id, name)')
       .eq('id', shiftId)
       .single()
       .then(({ data, error }) => {
@@ -39,6 +39,7 @@ export function ShiftReport({ shiftId }: Props) {
   if (error || !shift) return <p className="px-1 py-6 text-sm text-rojo">{error}</p>
 
   const report = buildShiftReport(shift.sales)
+  const accountReport = buildAccountReport(shift.sales, shift.accounts ?? [])
   const bartenderName = shift.profiles?.full_name || 'Bartender'
 
   return (
@@ -98,6 +99,53 @@ export function ShiftReport({ shiftId }: Props) {
           </table>
         )}
       </section>
+
+      {accountReport.length > 0 && (
+        <section className="mt-5">
+          <SectionLabel>Ventas a cuentas</SectionLabel>
+          {accountReport.map((acc) => (
+            <div key={acc.accountId} className="mt-3">
+              <p className="text-[12px] font-bold tracking-[0.06em] text-tinta uppercase">
+                {acc.accountName}
+              </p>
+              <table className="mt-1 w-full text-sm">
+                <tbody>
+                  {acc.lines.map((line) => (
+                    <tr key={line.productId} className="border-b border-dashed border-hair">
+                      <td className="py-2 pr-2 font-semibold text-tinta">{line.name}</td>
+                      <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta">
+                        × {line.quantity}
+                      </td>
+                      <td className="px-1.5 py-2 text-right font-mono tabular-nums text-tinta-suave">
+                        {formatMoney(line.unitPrice)}
+                        {line.catalogUnitPrice != null &&
+                          line.catalogUnitPrice !== line.unitPrice && (
+                            <span className="mt-0.5 block text-[10px] line-through opacity-70">
+                              {formatMoney(line.catalogUnitPrice)}
+                            </span>
+                          )}
+                      </td>
+                      <td className="py-2 pl-2 text-right font-mono tabular-nums text-tinta">
+                        {formatMoney(line.subtotal)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-solid border-hair-fuerte">
+                    <td className="py-2 font-semibold text-tinta" colSpan={3}>
+                      Subtotal cuenta
+                    </td>
+                    <td className="py-2 text-right font-mono font-semibold tabular-nums text-tinta">
+                      {formatMoney(acc.subtotal)}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          ))}
+        </section>
+      )}
 
       {report.adjusted.length > 0 && (
         <section className="mt-5">

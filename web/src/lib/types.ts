@@ -68,4 +68,6 @@ export interface SaleWithProduct extends Sale {
 export interface ShiftWithDetails extends Shift {
   profiles: { full_name: string } | null
   sales: SaleWithProduct[]
+  /** Accounts embedded by the report query (id and name only). */
+  accounts?: Pick<Account, 'id' | 'name'>[]
 }
