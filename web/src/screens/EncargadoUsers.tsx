@@ -1,13 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { ROLE_LABEL, type Profile, type Role } from '../lib/types'
+import { DataTable, type DataTableColumn, type DataTableFilter } from '../components/DataTable'
 import { Drawer } from '../components/Drawer'
 import { ScreenHead } from '../components/ScreenHead'
-import { ListRowsSkeleton } from './skeleton'
 import { toast } from '../components/Toast'
 import { validateNewUser, type NewUserErrors } from '../lib/newUser'
 import { validateEditUser, type EditUserErrors } from '../lib/editUser'
-import { ROLE_LABEL, type Profile, type Role } from '../lib/types'
 import { PasswordInput } from '../components/PasswordInput'
 
 /** Profile row with the creation date shown in the list. */
@@ -216,6 +216,38 @@ export function UsersTab({ profile }: { profile: Profile }) {
     setProfiles((data ?? []) as StaffProfile[])
   }
 
+  const columns: DataTableColumn<StaffProfile>[] = [
+    {
+      key: 'name',
+      header: 'Usuario',
+      cell: (p) => (
+        <span>
+          <span className="block text-sm font-semibold text-tinta">
+            {p.full_name || '(sin nombre)'}
+          </span>
+          <span className="block text-xs text-tinta-suave">{ROLE_LABEL[p.role]}</span>
+        </span>
+      ),
+    },
+    {
+      key: 'role',
+      header: 'Rol',
+      cell: (p) => <span className="text-xs font-semibold text-tinta">{ROLE_LABEL[p.role]}</span>,
+    },
+  ]
+
+  const rolFilter: DataTableFilter<StaffProfile> = {
+    id: 'rol',
+    label: 'Rol',
+    options: [
+      { value: '', label: 'Todos' },
+      { value: 'admin', label: 'Admins' },
+      { value: 'manager', label: 'Encargados' },
+      { value: 'bartender', label: 'Bartenders' },
+    ],
+    predicate: (p, value) => p.role === value,
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-5 pt-4">
       <ScreenHead title="Usuarios" subtitle={`${profiles?.length ?? 0} cuentas`} />
@@ -267,34 +299,25 @@ export function UsersTab({ profile }: { profile: Profile }) {
         ) : null}
       </Drawer>
 
-      <div>
-        {profiles === null ? (
-          <ListRowsSkeleton label="Cargando usuarios" rows={4} />
-        ) : profiles.length === 0 ? (
-          <p className="py-3 text-sm text-tinta-suave">Todavía no hay usuarios cargados.</p>
-        ) : (
-          profiles.map((p) => (
-            <div
-              key={p.id}
-              className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-hair py-2.5"
+      <div className="mt-3.5">
+        <DataTable
+          rows={profiles}
+          rowKey={(p) => p.id}
+          columns={columns}
+          searchFields={(p) => [p.full_name]}
+          searchPlaceholder="Buscar usuario…"
+          filters={[rolFilter]}
+          emptyCatalog="Todavía no hay usuarios cargados."
+          renderActions={(p) => (
+            <button
+              type="button"
+              onClick={() => setEditing(p)}
+              className="min-h-9 rounded-lg border border-hair-fuerte px-2.5 text-xs font-semibold text-tinta"
             >
-              <div>
-                <p className="text-sm font-semibold text-tinta">{p.full_name || '(sin nombre)'}</p>
-                <p className="text-xs text-tinta-suave">{ROLE_LABEL[p.role]}</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditing(p)}
-                  disabled={editing !== null}
-                  className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
-                >
-                  Editar
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+              Editar
+            </button>
+          )}
+        />
       </div>
     </main>
   )
