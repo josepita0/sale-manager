@@ -1,8 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { DataTable, type DataTableColumn, type DataTableFilter } from '../components/DataTable'
 import { Drawer } from '../components/Drawer'
 import { ScreenHead } from '../components/ScreenHead'
-import { ListRowsSkeleton } from './skeleton'
 import type { VipCustomer } from '../lib/types'
 
 function VipForm({
@@ -105,6 +105,38 @@ export function VipCustomersTab() {
 
   const activeCount = (customers ?? []).filter((c) => c.active).length
 
+  const columns: DataTableColumn<VipCustomer>[] = [
+    {
+      key: 'name',
+      header: 'Cliente',
+      cell: (c) => (
+        <span className={`font-semibold ${c.active ? 'text-tinta' : 'text-tinta-suave'}`}>
+          {c.name}
+        </span>
+      ),
+    },
+    {
+      key: 'estado',
+      header: 'Estado',
+      cell: (c) => (
+        <span className={`text-[11px] font-semibold ${c.active ? 'text-tinta-suave' : 'text-rojo'}`}>
+          {c.active ? 'Activo' : 'Inactivo'}
+        </span>
+      ),
+    },
+  ]
+
+  const estadoFilter: DataTableFilter<VipCustomer> = {
+    id: 'estado',
+    label: 'Estado',
+    options: [
+      { value: '', label: 'Todos' },
+      { value: 'activo', label: 'Activos' },
+      { value: 'inactivo', label: 'Inactivos' },
+    ],
+    predicate: (c, value) => (value === 'activo' ? c.active : value === 'inactivo' ? !c.active : true),
+  }
+
   return (
     <main className="mx-auto max-w-3xl px-5 pt-4">
       <ScreenHead
@@ -154,50 +186,44 @@ export function VipCustomersTab() {
         ) : null}
       </Drawer>
 
-      <div>
-        {customers === null ? (
-          <ListRowsSkeleton label="Cargando clientes VIP" rows={4} />
-        ) : customers.length === 0 ? (
-          <p className="py-3 text-sm text-tinta-suave">Todavía no hay clientes VIP cargados.</p>
-        ) : (
-          customers.map((c) => (
-            <div
-              key={c.id}
-              className="flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-hair py-2.5"
-            >
-              <p className={`text-sm font-semibold ${c.active ? 'text-tinta' : 'text-tinta-suave'}`}>
-                {c.name}
-                {!c.active && <span className="ml-2 text-xs font-normal">Inactivo</span>}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditing(c)}
-                  disabled={busy}
-                  className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
-                >
-                  Editar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void toggleActive(c)}
-                  disabled={busy}
-                  className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
-                >
-                  {c.active ? 'Desactivar' : 'Activar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void remove(c)}
-                  disabled={busy}
-                  className="min-h-11 rounded-lg border border-rojo/50 px-3 text-xs font-semibold text-rojo disabled:opacity-40"
-                >
-                  Eliminar
-                </button>
-              </div>
+      <div className="mt-3.5">
+        <DataTable
+          rows={customers}
+          rowKey={(c) => c.id}
+          columns={columns}
+          searchFields={(c) => [c.name]}
+          searchPlaceholder="Buscar cliente…"
+          filters={[estadoFilter]}
+          emptyCatalog="Todavía no hay clientes VIP cargados."
+          renderActions={(c) => (
+            <div className="flex flex-wrap justify-end gap-1">
+              <button
+                type="button"
+                onClick={() => setEditing(c)}
+                disabled={busy}
+                className="min-h-9 rounded-lg border border-hair-fuerte px-2.5 text-xs font-semibold text-tinta disabled:opacity-40"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => void toggleActive(c)}
+                disabled={busy}
+                className="min-h-9 rounded-lg border border-hair-fuerte px-2.5 text-xs font-semibold text-tinta disabled:opacity-40"
+              >
+                {c.active ? 'Desactivar' : 'Activar'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void remove(c)}
+                disabled={busy}
+                className="min-h-9 rounded-lg border border-rojo/50 px-2.5 text-xs font-semibold text-rojo disabled:opacity-40"
+              >
+                Eliminar
+              </button>
             </div>
-          ))
-        )}
+          )}
+        />
       </div>
     </main>
   )

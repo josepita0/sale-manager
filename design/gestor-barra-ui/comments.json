@@ -12,6 +12,42 @@
       "sentAt": "2026-11-27T12:13:25.299Z",
       "resolvedAt": "2026-11-27T12:14:27.360Z",
       "resolution": "Navbar nuevo con botón central MENÚ que abre un sidebar lateral (Usuarios + identidad) abierto en la vista; interactivo: MENÚ, backdrop y Escape lo cierran. Aparece con más de 4 opciones."
+    },
+    {
+      "id": "1bu9cda6",
+      "file": "02-comanda-clara.html",
+      "selector": "body > div:nth-of-type(2)",
+      "excerpt": "TURNO — NAVBAR NUEVO: 4 PESTAÑAS + BOTÓN CENTRAL LA BARRA Turno abierto · 22:14 JP RECAUDADO EN EL TURNO 68.500 € 5 cortesías 16 ventas Anotando en la cuenta: Martín G. ✕ VENTA CORTESÍA Cerveza 3.500 € Fernet + Coca 5.000 € Gin Tonic 5.500 € Vodka + Sprite 5.000 € Coca 2.500 € Agua 2.000 € Vino 4.00",
+      "comment": "Generame una vista nueva en la que solo se vea la lista de los productos, sin sidebar, ni drawer saliente",
+      "createdAt": "2026-11-27T12:33:01.200Z",
+      "status": "resolved",
+      "sentAt": "2026-11-27T12:33:01.210Z",
+      "resolvedAt": "2026-11-27T12:33:25.129Z",
+      "resolution": "Nuevo frame \"Turno — solo la grilla de productos\": 12 productos a pantalla completa, sin tira de totales, chip, modo Venta/Cortesía, ticket flotante ni sidebar abierto; navbar con MENÚ funcional."
+    },
+    {
+      "id": "5db4pfxt",
+      "file": "02-comanda-clara.html",
+      "selector": "body > div:nth-of-type(2) > section:nth-of-type(8) > div > div:nth-of-type(1)",
+      "excerpt": "",
+      "comment": "Duplica esta pero sin el drawer",
+      "createdAt": "2026-11-27T12:33:43.088Z",
+      "status": "resolved",
+      "sentAt": "2026-11-27T12:33:43.097Z",
+      "resolvedAt": "2026-11-27T12:34:29.421Z",
+      "resolution": "Frame duplicado \"Productos — lista limpia, sin sheet\": misma lista con toolbar Nuevo producto y ···, sin backdrop ni bottom sheet de acciones."
+    },
+    {
+      "id": "kmb2imm0",
+      "file": "02-comanda-clara.html",
+      "selector": "body > div:nth-of-type(2) > section:nth-of-type(9) > div > main",
+      "excerpt": "NUEVO PRODUCTO Cerveza 3.500 € ··· Fernet + Coca 5.000 € ··· Gin Tonic 5.500 € ··· Coca 2.500 € · inactiva ··· Agua 2.000 € ···",
+      "comment": "Perfecto, ahora quiero que me diseñes un modelo de tabla con paginacion, para cuando tengamos muchos productos",
+      "createdAt": "2026-11-27T12:35:29.288Z",
+      "status": "resolved",
+      "sentAt": "2026-11-27T12:35:29.297Z",
+      "resolvedAt": "2026-11-27T12:36:08.956Z",
+      "resolution": "Nuevo frame \"Productos — tabla con paginación\": tabla Producto/Precio/Estado/··· con 8 filas por página, contador 1–8 de 21 y pager ‹ 1 2 3 ›; inactivas atenuadas con estado en rojo."
     }
   ]
 }

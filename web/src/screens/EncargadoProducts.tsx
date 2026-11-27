@@ -1,12 +1,11 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { formatMoney } from '../lib/format'
-import { filterProducts } from '../lib/search'
+import { DataTable, type DataTableColumn, type DataTableFilter } from '../components/DataTable'
 import { Drawer } from '../components/Drawer'
 import { Sheet } from '../components/Sheet'
 import { ScreenHead } from '../components/ScreenHead'
 import { LapizIcon, MasIcon, PausaIcon, TachoIcon } from '../components/icons'
-import { ListRowsSkeleton } from './skeleton'
 import type { Product } from '../lib/types'
 
 function ProductForm({
@@ -106,7 +105,6 @@ export function ProductsTab() {
   const [actionsFor, setActionsFor] = useState<Product | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [query, setQuery] = useState('')
 
   useEffect(() => {
     void load()
@@ -149,7 +147,39 @@ export function ProductsTab() {
 
   const activeCount = (products ?? []).filter((p) => p.active).length
   const total = products?.length ?? 0
-  const visibleProducts = products ? filterProducts(products, query) : []
+
+  const columns: DataTableColumn<Product>[] = [
+    {
+      key: 'name',
+      header: 'Producto',
+      cell: (p) => (
+        <span className={`font-semibold ${p.active ? 'text-tinta' : 'text-tinta-suave'}`}>
+          {p.name}
+        </span>
+      ),
+    },
+    { key: 'price', header: 'Precio', numeric: true, cell: (p) => formatMoney(p.price) },
+    {
+      key: 'estado',
+      header: 'Estado',
+      cell: (p) => (
+        <span className={`text-[11px] font-semibold ${p.active ? 'text-tinta-suave' : 'text-rojo'}`}>
+          {p.active ? 'Activa' : 'Inactiva'}
+        </span>
+      ),
+    },
+  ]
+
+  const estadoFilter: DataTableFilter<Product> = {
+    id: 'estado',
+    label: 'Estado',
+    options: [
+      { value: '', label: 'Todas' },
+      { value: 'activa', label: 'Activas' },
+      { value: 'inactiva', label: 'Inactivas' },
+    ],
+    predicate: (p, value) => (value === 'activa' ? p.active : value === 'inactiva' ? !p.active : true),
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-4">
@@ -164,15 +194,6 @@ export function ProductsTab() {
         </p>
       )}
 
-      <input
-        type="search"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Buscar producto…"
-        aria-label="Buscar producto"
-        className="h-11 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
-      />
-
       <div className="mt-3.5 flex justify-end">
         <button
           type="button"
@@ -185,40 +206,25 @@ export function ProductsTab() {
       </div>
 
       <div className="mt-3.5">
-        {products === null ? (
-          <ListRowsSkeleton label="Cargando productos" rows={6} />
-        ) : products.length === 0 ? (
-          <p className="py-3 text-sm text-tinta-suave">El catálogo está vacío.</p>
-        ) : visibleProducts.length === 0 ? (
-          <p className="py-3 text-sm text-tinta-suave">
-            Ningún producto coincide con “{query}”.
-          </p>
-        ) : (
-          visibleProducts.map((p) => (
-            <div
-              key={p.id}
-              className="flex items-center justify-between gap-3 border-b border-dashed border-hair py-2.5"
+        <DataTable
+          rows={products}
+          rowKey={(p) => p.id}
+          columns={columns}
+          searchFields={(p) => [p.name]}
+          searchPlaceholder="Buscar producto…"
+          filters={[estadoFilter]}
+          emptyCatalog="El catálogo está vacío."
+          renderActions={(p) => (
+            <button
+              type="button"
+              onClick={() => setActionsFor(p)}
+              aria-label={`Acciones de ${p.name}`}
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg border-[1.5px] border-tinta text-sm font-bold text-tinta before:absolute before:-inset-1 before:rounded-lg before:content-['']"
             >
-              <div>
-                <p className={`text-sm font-semibold ${p.active ? 'text-tinta' : 'text-tinta-suave'}`}>
-                  {p.name}
-                </p>
-                <p className="mt-0.5 font-mono text-xs tabular-nums text-tinta-suave">
-                  {formatMoney(p.price)}
-                  {!p.active && ' · Inactiva'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActionsFor(p)}
-                aria-label={`Acciones de ${p.name}`}
-                className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-[1.5px] border-tinta text-sm font-bold text-tinta before:absolute before:-inset-1 before:rounded-lg before:content-['']"
-              >
-                ···
-              </button>
-            </div>
-          ))
-        )}
+              ···
+            </button>
+          )}
+        />
       </div>
 
       <Drawer

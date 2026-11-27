@@ -62,6 +62,20 @@
   .row small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
   .row .cort-tag{color:var(--accent);font-weight:650}
   .minus{width:36px;height:36px;border-radius:8px;border:1.5px solid var(--ink);font-size:17px;flex-shrink:0}
+  .ptable{width:100%;border-collapse:collapse;font-size:13.5px}
+  .ptable th{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);font-weight:650;text-align:left;padding:6px 4px;border-bottom:2px dashed var(--border-2)}
+  .ptable th.num,.ptable td.num{text-align:right}
+  .ptable td{padding:9px 4px;border-bottom:1px dashed var(--border)}
+  .ptable td b{font-weight:650}
+  .ptable tr.off td{color:var(--muted)}
+  .ptable .estado{font-size:11px;font-weight:600}
+  .ptable .estado.in{color:var(--accent)}
+  .pager{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+  .pcount{font-size:11.5px;color:var(--muted)}
+  .ppages{display:flex;gap:6px}
+  .ppages button{min-width:28px;height:28px;border:1.5px solid var(--border-2);border-radius:6px;font-size:12px;font-weight:650;color:var(--muted)}
+  .ppages button.on{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+  .ppages button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .cerrar{width:100%;margin-top:16px;background:var(--accent);color:#fff;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.05em;padding:14px 0;border-radius:8px;text-align:center}
   .navbar{display:flex;border-top:2px solid var(--ink);background:var(--surface);padding:6px 10px 14px}
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;font-size:10.5px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-top:3px solid transparent;margin-top:-3px}
@@ -256,6 +270,58 @@
     <p class="cap-note">El sidebar lista lo que no entra en la barra (hoy, Usuarios) y ancla la identidad de quien atiende. Se cierra tocando afuera.</p>
   </section>
 
+  <!-- Frame 1c: grilla limpia, solo productos -->
+  <section class="shot" aria-label="Turno, solo la grilla de productos">
+    <p class="cap">Turno — solo la grilla de productos</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">La Barra</p><p class="sub">Turno abierto · 22:14</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="grid">
+          <button class="prod"><b>Cerveza</b><span class="mono">3.500 €</span></button>
+          <button class="prod"><b>Fernet + Coca</b><span class="mono">5.000 €</span></button>
+          <button class="prod"><b>Gin Tonic</b><span class="mono">5.500 €</span></button>
+          <button class="prod"><b>Vodka + Sprite</b><span class="mono">5.000 €</span></button>
+          <button class="prod"><b>Coca</b><span class="mono">2.500 €</span></button>
+          <button class="prod"><b>Agua</b><span class="mono">2.000 €</span></button>
+          <button class="prod"><b>Vino</b><span class="mono">4.000 €</span></button>
+          <button class="prod"><b>Trago de autor</b><span class="mono">6.000 €</span></button>
+          <button class="prod"><b>Campari + Soda</b><span class="mono">5.500 €</span></button>
+          <button class="prod"><b>Café</b><span class="mono">1.800 €</span></button>
+          <button class="prod"><b>Gaseosa</b><span class="mono">2.200 €</span></button>
+          <button class="prod"><b>Papas</b><span class="mono">3.000 €</span></button>
+        </div>
+      </main>
+      <div class="backdrop" data-side-backdrop hidden></div>
+      <aside class="side closed" data-side-panel aria-label="Más opciones de navegación">
+        <p class="seclbl">Más opciones</p>
+        <div class="who-row">
+          <span class="who-av" aria-hidden="true">JP</span>
+          <span><b>José P.</b><small>Encargado · sesión activa</small></span>
+        </div>
+        <button class="nav-item" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="16.5" cy="9" r="2.6"/><path d="M15.5 14.6c2.4.2 4.3 1.6 4.9 4.4"/></svg>
+          Usuarios
+          <small>5 cuentas</small>
+        </button>
+        <p class="note">El botón central aparece cuando la navegación supera las 4 opciones: lo que no entra en la barra, vive acá.</p>
+      </aside>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Turno</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M9 13h6"/></svg>Productos</button>
+        <button class="menubtn" data-menu-btn type="button" aria-expanded="false" aria-controls="side-panel" aria-label="Abrir el menú de navegación">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <small>MENÚ</small>
+        </button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 9.3l5-.7z"/></svg>VIP</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2"/></svg>Reporte</button>
+      </nav>
+    </div>
+    <p class="cap-note">Grilla limpia: sin tira de totales, chip, modo Venta/Cortesía ni ticket flotante. Solo productos; el MENÚ sigue a mano para el sidebar.</p>
+  </section>
+
   <script>
     (function(){
       function init(phone){
@@ -444,6 +510,79 @@
         <button class="cancel">Cancelar</button>
       </div>
     </div>
+  </section>
+
+  <!-- Frame 6b: Productos, lista limpia sin sheet -->
+  <section class="shot" aria-label="Productos, encargado, lista sin acciones abiertas">
+    <p class="cap">Productos — lista limpia, sin sheet</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">Productos</p><p class="sub">8 en el catálogo · 6 activos</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="fabrow"><button class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuevo producto</button></div>
+        <div class="rep">
+          <div class="row"><div><b>Cerveza</b><small class="mono">3.500 €</small></div><button class="minus" aria-label="Acciones de Cerveza">···</button></div>
+          <div class="row"><div><b>Fernet + Coca</b><small class="mono">5.000 €</small></div><button class="minus" aria-label="Acciones de Fernet + Coca">···</button></div>
+          <div class="row"><div><b>Gin Tonic</b><small class="mono">5.500 €</small></div><button class="minus" aria-label="Acciones de Gin Tonic">···</button></div>
+          <div class="row"><div><b>Coca</b><small class="mono">2.500 € · inactiva</small></div><button class="minus" aria-label="Acciones de Coca">···</button></div>
+          <div class="row"><div><b>Agua</b><small class="mono">2.000 €</small></div><button class="minus" aria-label="Acciones de Agua">···</button></div>
+        </div>
+      </main>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Mi turno</button>
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>Productos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Turnos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.3 1 6.2-5.5-3-5.5 3 1-6.2L3 9.5l6.3-.9z"/></svg>VIP</button>
+      </nav>
+    </div>
+  </section>
+
+  <!-- Frame 6c: Productos, tabla con paginación para catálogo grande -->
+  <section class="shot" aria-label="Productos, encargado, tabla con paginación">
+    <p class="cap">Productos — tabla con paginación (catálogo grande)</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">Productos</p><p class="sub">21 en el catálogo · 17 activos</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="fabrow"><button class="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nuevo producto</button></div>
+        <table class="ptable">
+          <thead>
+            <tr><th scope="col">Producto</th><th scope="col" class="num">Precio</th><th scope="col">Estado</th><th scope="col"><span class="sr-only">Acciones</span></th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>Cerveza</b></td><td class="num mono">3.500 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Cerveza">···</button></td></tr>
+            <tr><td><b>Fernet + Coca</b></td><td class="num mono">5.000 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Fernet + Coca">···</button></td></tr>
+            <tr><td><b>Gin Tonic</b></td><td class="num mono">5.500 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Gin Tonic">···</button></td></tr>
+            <tr><td><b>Vodka + Sprite</b></td><td class="num mono">5.000 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Vodka + Sprite">···</button></td></tr>
+            <tr class="off"><td><b>Coca</b></td><td class="num mono">2.500 €</td><td><span class="estado in">Inactiva</span></td><td><button class="minus" aria-label="Acciones de Coca">···</button></td></tr>
+            <tr><td><b>Agua</b></td><td class="num mono">2.000 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Agua">···</button></td></tr>
+            <tr><td><b>Vino</b></td><td class="num mono">4.000 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Vino">···</button></td></tr>
+            <tr><td><b>Café</b></td><td class="num mono">1.800 €</td><td><span class="estado">Activa</span></td><td><button class="minus" aria-label="Acciones de Café">···</button></td></tr>
+          </tbody>
+        </table>
+        <div class="pager">
+          <span class="pcount mono">1–8 de 21</span>
+          <div class="ppages" role="navigation" aria-label="Páginas del catálogo">
+            <button type="button" aria-label="Página anterior" disabled>‹</button>
+            <button type="button" class="on" aria-current="page">1</button>
+            <button type="button">2</button>
+            <button type="button">3</button>
+            <button type="button" aria-label="Página siguiente">›</button>
+          </div>
+        </div>
+      </main>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Mi turno</button>
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/></svg>Productos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>Turnos</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.3.9-4.5 4.3 1 6.2-5.5-3-5.5 3 1-6.2L3 9.5l6.3-.9z"/></svg>VIP</button>
+      </nav>
+    </div>
+    <p class="cap-note">Con catálogos grandes, la lista se vuelve tabla: 8 filas por página, contador 1–8 de 21 y pager ‹ 1 2 3 ›. Las inactivas se atenúan con su estado en rojo.</p>
   </section>
 
   <!-- Frame 7: drawer de alta -->
