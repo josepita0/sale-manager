@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
+import { Drawer } from '../components/Drawer'
 import { ScreenHead } from '../components/ScreenHead'
 import { ListRowsSkeleton } from './skeleton'
 import type { VipCustomer } from '../lib/types'
@@ -39,7 +40,7 @@ function VipForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-hair bg-carta p-4">
+    <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
       <div className="mb-3.5">
         <label
           htmlFor="vip-name"
@@ -58,7 +59,7 @@ function VipForm({
       <button
         type="submit"
         disabled={busy}
-        className="min-h-12 w-full rounded-lg bg-tinta px-4 py-2.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
+        className="mt-auto min-h-12 w-full rounded-lg bg-tinta py-3.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
       >
         Guardar
       </button>
@@ -122,19 +123,25 @@ export function VipCustomersTab() {
       )}
 
       <div className="mb-3 flex justify-end">
-        {!editing && (
-          <button
-            type="button"
-            onClick={() => setEditing('new')}
-            className="min-h-11 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
-          >
-            + Nuevo cliente
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setEditing('new')}
+          className="min-h-11 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
+        >
+          + Nuevo cliente
+        </button>
       </div>
 
-      {editing && (
-        <div className="mb-3">
+      <Drawer
+        open={editing !== null}
+        title={
+          editing === 'new' ? 'Nuevo cliente' : editing ? `Editar ${editing.name}` : 'Cliente VIP'
+        }
+        heading={editing === 'new' ? 'Nuevo cliente' : 'Editar cliente'}
+        subtitle="Destino opcional de las cortesías."
+        onClose={() => setEditing(null)}
+      >
+        {editing ? (
           <VipForm
             key={editing === 'new' ? 'new' : editing.id}
             initial={editing === 'new' ? null : editing}
@@ -144,15 +151,8 @@ export function VipCustomersTab() {
             }}
             onError={setError}
           />
-          <button
-            type="button"
-            onClick={() => setEditing(null)}
-            className="mt-2 min-h-11 text-sm text-tinta-suave underline-offset-2 hover:underline"
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
+        ) : null}
+      </Drawer>
 
       <div>
         {customers === null ? (
@@ -173,7 +173,7 @@ export function VipCustomersTab() {
                 <button
                   type="button"
                   onClick={() => setEditing(c)}
-                  disabled={busy || editing !== null}
+                  disabled={busy}
                   className="min-h-11 rounded-lg border border-hair-fuerte px-3 text-xs font-semibold text-tinta disabled:opacity-40"
                 >
                   Editar
