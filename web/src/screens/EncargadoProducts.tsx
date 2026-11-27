@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../lib/supabase'
 import { formatMoney } from '../lib/format'
+import { filterProducts } from '../lib/search'
 import { Drawer } from '../components/Drawer'
 import { Sheet } from '../components/Sheet'
 import { ScreenHead } from '../components/ScreenHead'
@@ -105,6 +106,7 @@ export function ProductsTab() {
   const [actionsFor, setActionsFor] = useState<Product | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
     void load()
@@ -147,6 +149,7 @@ export function ProductsTab() {
 
   const activeCount = (products ?? []).filter((p) => p.active).length
   const total = products?.length ?? 0
+  const visibleProducts = products ? filterProducts(products, query) : []
 
   return (
     <main className="mx-auto max-w-3xl px-5 pt-4">
@@ -161,7 +164,16 @@ export function ProductsTab() {
         </p>
       )}
 
-      <div className="flex justify-end">
+      <input
+        type="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Buscar producto…"
+        aria-label="Buscar producto"
+        className="h-11 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
+      />
+
+      <div className="mt-3.5 flex justify-end">
         <button
           type="button"
           onClick={() => setEditing('new')}
@@ -177,8 +189,12 @@ export function ProductsTab() {
           <ListRowsSkeleton label="Cargando productos" rows={6} />
         ) : products.length === 0 ? (
           <p className="py-3 text-sm text-tinta-suave">El catálogo está vacío.</p>
+        ) : visibleProducts.length === 0 ? (
+          <p className="py-3 text-sm text-tinta-suave">
+            Ningún producto coincide con “{query}”.
+          </p>
         ) : (
-          products.map((p) => (
+          visibleProducts.map((p) => (
             <div
               key={p.id}
               className="flex items-center justify-between gap-3 border-b border-dashed border-hair py-2.5"
