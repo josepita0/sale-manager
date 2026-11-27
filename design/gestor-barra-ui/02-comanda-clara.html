@@ -67,6 +67,22 @@
   .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;font-size:10.5px;font-weight:650;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-top:3px solid transparent;margin-top:-3px}
   .tab svg{width:21px;height:21px}
   .tab.on{color:var(--ink);border-top-color:var(--accent)}
+  .menubtn{flex:0 0 auto;align-self:center;width:54px;height:54px;margin:-20px 6px 4px;border-radius:50%;background:var(--ink);color:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;box-shadow:0 8px 20px rgba(60,45,20,.38);border:3px solid var(--surface)}
+  .menubtn svg{width:19px;height:19px}
+  .menubtn small{font-size:8px;font-weight:750;letter-spacing:.1em}
+  .tab:focus-visible,.menubtn:focus-visible,.nav-item:focus-visible,.backdrop:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .backdrop[hidden]{display:none}
+  .side{position:absolute;top:0;right:0;bottom:0;width:250px;background:var(--surface);border-left:2px solid var(--ink);padding:20px 18px;box-shadow:-14px 0 40px rgba(60,45,20,.28);display:flex;flex-direction:column;transition:transform .2s ease}
+  .side.closed{transform:translateX(105%);box-shadow:none}
+  .side .seclbl{margin:0 0 6px}
+  .side .who-row{display:flex;align-items:center;gap:10px;padding:10px 2px 12px;border-bottom:2px dashed var(--border-2)}
+  .side .who-av{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:750;flex-shrink:0}
+  .side .who-row b{font-size:13.5px;display:block}
+  .side .who-row small{font-size:11px;color:var(--muted)}
+  .side .nav-item{display:flex;align-items:center;gap:10px;width:100%;padding:13px 2px;border-top:1px dashed var(--border);font-size:14px;font-weight:600;text-align:left}
+  .side .nav-item svg{width:19px;height:19px;color:var(--muted)}
+  .side .nav-item small{margin-left:auto;font-size:11px;color:var(--muted);font-weight:400}
+  .side .note{margin-top:auto}
   .fabfloat{position:absolute;right:18px;bottom:92px;width:62px;height:62px;border-radius:50%;background:var(--accent);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 10px 24px rgba(60,45,20,.38)}
   .fabfloat svg{width:24px;height:24px}
   .fabfloat .n{position:absolute;top:-6px;right:-2px;background:var(--ink);color:#fff;border-radius:999px;font-size:11px;font-weight:750;padding:2px 7px}
@@ -104,13 +120,13 @@
 <body>
 <div class="dir-head">
   <h1>Dirección 02 — Comanda de papel (claro) · ticket flotante + cuentas abiertas</h1>
-  <p>La grilla ocupa todo el turno; un <strong>botón flotante</strong> abre la comanda. Lo tocado se marca pendiente y se registra por lote. Dentro de la comanda, “Abrir cuenta” deja cuentas abiertas en paralelo (con nombre libre o cliente VIP): mientras una cuenta está activa, cada tap de la grilla anota en esa cuenta. Tradeoff: máxima legibilidad diurna y carácter de ticket; menos ambiente nocturno.</p>
+  <p>La grilla ocupa todo el turno; un <strong>botón flotante</strong> abre la comanda. Lo tocado se marca pendiente y se registra por lote. Dentro de la comanda, “Abrir cuenta” deja cuentas abiertas en paralelo (con nombre libre o cliente VIP): mientras una cuenta está activa, cada tap de la grilla anota en esa cuenta. Navegación: con más de 4 opciones, el navbar muestra 4 y un botón central que abre un sidebar lateral con el resto. Tradeoff: máxima legibilidad diurna y carácter de ticket; menos ambiente nocturno.</p>
 </div>
 <div class="frames">
 
   <!-- Frame 1: Turno con FAB y cuenta activa -->
   <section class="shot" aria-label="Turno, grilla con botón flotante y cuenta activa">
-    <p class="cap">Turno — anotando dentro de una cuenta</p>
+    <p class="cap">Turno — navbar nuevo: 4 pestañas + botón central</p>
     <div class="phone">
       <header class="app-head">
         <div><p class="brand">La Barra</p><p class="sub">Turno abierto · 22:14</p></div>
@@ -146,13 +162,120 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-2-2.5 2-2.5-2L7 21z"/><path d="M10 8h4M10 12h4"/></svg>
         <small>TICKET</small>
       </button>
+      <div class="backdrop" data-side-backdrop hidden></div>
+      <aside class="side closed" data-side-panel aria-label="Más opciones de navegación">
+        <p class="seclbl">Más opciones</p>
+        <div class="who-row">
+          <span class="who-av" aria-hidden="true">JP</span>
+          <span><b>José P.</b><small>Encargado · sesión activa</small></span>
+        </div>
+        <button class="nav-item" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="16.5" cy="9" r="2.6"/><path d="M15.5 14.6c2.4.2 4.3 1.6 4.9 4.4"/></svg>
+          Usuarios
+          <small>5 cuentas</small>
+        </button>
+        <p class="note">El botón central aparece cuando la navegación supera las 4 opciones: lo que no entra en la barra, vive acá.</p>
+      </aside>
       <nav class="navbar" aria-label="Navegación">
         <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Turno</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M9 13h6"/></svg>Productos</button>
+        <button class="menubtn" data-menu-btn type="button" aria-expanded="false" aria-controls="side-panel" aria-label="Abrir el menú de navegación">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <small>MENÚ</small>
+        </button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 9.3l5-.7z"/></svg>VIP</button>
         <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2"/></svg>Reporte</button>
       </nav>
     </div>
-    <p class="cap-note">Sin chip activo, los taps caen en la comanda suelta. Con cuenta activa, caen a esa cuenta; el ✕ vuelve a la comanda suelta.</p>
+    <p class="cap-note">Así se ve el navbar en el turno: 4 pestañas y el botón central. Tocá MENÚ para abrir el sidebar; backdrop y Escape también lo cierran.</p>
   </section>
+
+  <!-- Frame 1b: el mismo turno con el sidebar abierto -->
+  <section class="shot" aria-label="Turno, con el sidebar de navegación abierto">
+    <p class="cap">Turno — sidebar abierto: el resto de la navegación</p>
+    <div class="phone">
+      <header class="app-head">
+        <div><p class="brand">La Barra</p><p class="sub">Turno abierto · 22:14</p></div>
+        <button class="avatar" aria-label="Cerrar sesión">JP</button>
+      </header>
+      <main>
+        <div class="tira">
+          <div><p class="lbl">Recaudado en el turno</p><p class="big mono">68.500 €</p></div>
+          <p class="side"><b>5 cortesías</b><br>16 ventas</p>
+        </div>
+        <div class="chip">
+          Anotando en la cuenta: <em>Martín G.</em>
+          <button aria-label="Dejar de anotar en la cuenta de Martín G.">✕</button>
+        </div>
+        <div class="seg" role="group" aria-label="Modo de registro">
+          <button class="on" aria-pressed="true">Venta</button>
+          <button aria-pressed="false">Cortesía</button>
+        </div>
+        <div class="grid">
+          <button class="prod"><b>Cerveza</b><span class="mono">3.500 €</span></button>
+          <button class="prod"><b>Fernet + Coca</b><span class="mono">5.000 €</span></button>
+          <button class="prod"><b>Gin Tonic</b><span class="mono">5.500 €</span></button>
+          <button class="prod"><b>Vodka + Sprite</b><span class="mono">5.000 €</span></button>
+          <button class="prod"><b>Coca</b><span class="mono">2.500 €</span></button>
+          <button class="prod"><b>Agua</b><span class="mono">2.000 €</span></button>
+          <button class="prod"><b>Vino</b><span class="mono">4.000 €</span></button>
+          <button class="prod"><b>Trago de autor</b><span class="mono">6.000 €</span></button>
+          <button class="prod"><b>Campari + Soda</b><span class="mono">5.500 €</span></button>
+        </div>
+      </main>
+      <button class="fabfloat" aria-label="Abrir comanda, 6 ítems pendientes">
+        <span class="n mono">6</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h10v18l-2.5-2-2.5 2-2.5-2L7 21z"/><path d="M10 8h4M10 12h4"/></svg>
+        <small>TICKET</small>
+      </button>
+      <div class="backdrop" data-side-backdrop></div>
+      <aside class="side" data-side-panel aria-label="Más opciones de navegación">
+        <p class="seclbl">Más opciones</p>
+        <div class="who-row">
+          <span class="who-av" aria-hidden="true">JP</span>
+          <span><b>José P.</b><small>Encargado · sesión activa</small></span>
+        </div>
+        <button class="nav-item" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><circle cx="16.5" cy="9" r="2.6"/><path d="M15.5 14.6c2.4.2 4.3 1.6 4.9 4.4"/></svg>
+          Usuarios
+          <small>5 cuentas</small>
+        </button>
+        <p class="note">El botón central aparece cuando la navegación supera las 4 opciones: lo que no entra en la barra, vive acá.</p>
+      </aside>
+      <nav class="navbar" aria-label="Navegación">
+        <button class="tab on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h14l-7 8z"/><path d="M12 12v7M8 19h8"/></svg>Turno</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h16v11H4z"/><path d="M4 9l1.5-4h13L20 9"/><path d="M9 13h6"/></svg>Productos</button>
+        <button class="menubtn" data-menu-btn type="button" aria-expanded="true" aria-controls="side-panel" aria-label="Cerrar el menú de navegación">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <small>MENÚ</small>
+        </button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 9.3l5-.7z"/></svg>VIP</button>
+        <button class="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2"/></svg>Reporte</button>
+      </nav>
+    </div>
+    <p class="cap-note">El sidebar lista lo que no entra en la barra (hoy, Usuarios) y ancla la identidad de quien atiende. Se cierra tocando afuera.</p>
+  </section>
+
+  <script>
+    (function(){
+      function init(phone){
+        var panel=phone.querySelector('[data-side-panel]');
+        var bd=phone.querySelector('[data-side-backdrop]');
+        var btn=phone.querySelector('[data-menu-btn]');
+        if(!panel||!bd||!btn)return;
+        function render(open){
+          panel.classList.toggle('closed',!open);
+          bd.hidden=!open;
+          btn.setAttribute('aria-expanded',String(open));
+          btn.setAttribute('aria-label',(open?'Cerrar':'Abrir')+' el menú de navegación');
+        }
+        btn.addEventListener('click',function(){render(panel.classList.contains('closed'))});
+        bd.addEventListener('click',function(){render(false)});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape')render(false)});
+      }
+      document.querySelectorAll('.phone').forEach(init);
+    })();
+  </script>
 
   <!-- Frame 2: comanda flotante con cuentas abiertas -->
   <section class="shot" aria-label="Comanda flotante con cuentas abiertas">

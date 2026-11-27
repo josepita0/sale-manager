@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { FunctionsHttpError } from '@supabase/supabase-js'
 import { supabase } from '../lib/supabase'
+import { Drawer } from '../components/Drawer'
 import { ScreenHead } from '../components/ScreenHead'
 import { ListRowsSkeleton } from './skeleton'
 import { toast } from '../components/Toast'
@@ -115,7 +116,7 @@ function UserForm({
   const labelClass = 'mb-1.5 block text-[10px] font-semibold tracking-[0.14em] text-tinta-suave uppercase'
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-hair bg-carta p-4">
+    <form onSubmit={handleSubmit} className="flex flex-1 flex-col">
       {!editing && (
         <div className="mb-3.5">
           <label htmlFor="user-email" className={labelClass}>
@@ -186,7 +187,7 @@ function UserForm({
       <button
         type="submit"
         disabled={busy}
-        className="min-h-12 w-full rounded-lg bg-tinta px-4 py-2.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
+        className="mt-auto min-h-12 w-full rounded-lg bg-tinta py-3.5 text-[13px] font-bold tracking-[0.05em] text-papel uppercase transition-opacity disabled:opacity-50"
       >
         {editing ? 'Guardar cambios' : 'Crear usuario'}
       </button>
@@ -230,19 +231,29 @@ export function UsersTab({ profile }: { profile: Profile }) {
       )}
 
       <div className="mb-3 flex justify-end">
-        {!editing && (
-          <button
-            type="button"
-            onClick={() => setEditing('new')}
-            className="min-h-11 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
-          >
-            + Nuevo usuario
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => setEditing('new')}
+          className="min-h-11 rounded-lg bg-tinta px-4 text-[12.5px] font-bold tracking-[0.05em] text-papel uppercase"
+        >
+          + Nuevo usuario
+        </button>
       </div>
 
-      {editing && (
-        <div className="mb-3">
+      <Drawer
+        open={editing !== null}
+        title={
+          editing === 'new'
+            ? 'Nuevo usuario'
+            : editing
+              ? `Editar ${editing.full_name || 'usuario'}`
+              : 'Usuario'
+        }
+        heading={editing === 'new' ? 'Nuevo usuario' : 'Editar usuario'}
+        subtitle="Nace confirmado, sin email de verificación."
+        onClose={() => setEditing(null)}
+      >
+        {editing ? (
           <UserForm
             key={editing === 'new' ? 'new' : editing.id}
             initial={editing === 'new' ? null : editing}
@@ -253,15 +264,8 @@ export function UsersTab({ profile }: { profile: Profile }) {
             }}
             onError={setError}
           />
-          <button
-            type="button"
-            onClick={() => setEditing(null)}
-            className="mt-2 min-h-11 text-sm text-tinta-suave underline-offset-2 hover:underline"
-          >
-            Cancelar
-          </button>
-        </div>
-      )}
+        ) : null}
+      </Drawer>
 
       <div>
         {profiles === null ? (

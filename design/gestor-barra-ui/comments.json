@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "comments": [
+    {
+      "id": "b4ovcxt9",
+      "file": "02-comanda-clara.html",
+      "selector": "body > div:nth-of-type(2) > section:nth-of-type(1) > div > nav",
+      "excerpt": "TURNO REPORTE",
+      "comment": "Desconozco el alcance real del proyecto, sin embargo, me gustaria que justo en el medio hubiera un boton que aperture un sidebar lateral apartir de que haya mas de 4 opciones en ella. Diseñame uan vista con como se veria con el sidebar, y el nuevo navbar",
+      "createdAt": "2026-11-27T12:13:25.289Z",
+      "status": "resolved",
+      "sentAt": "2026-11-27T12:13:25.299Z",
+      "resolvedAt": "2026-11-27T12:14:27.360Z",
+      "resolution": "Navbar nuevo con botón central MENÚ que abre un sidebar lateral (Usuarios + identidad) abierto en la vista; interactivo: MENÚ, backdrop y Escape lo cierran. Aparece con más de 4 opciones."
+    }
+  ]
+}

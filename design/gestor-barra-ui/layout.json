@@ -1,17 +1,21 @@
 {
   "arrangement": "free",
   "positions": {
+    "system": {
+      "x": 4616,
+      "y": 52
+    },
     "01-tactil-oscura.html": {
-      "x": 0,
+      "x": 19,
       "y": 52
     },
     "02-comanda-clara.html": {
-      "x": 1357,
+      "x": 1376,
       "y": 88
     },
     "03-suizo-plano.html": {
-      "x": 1397,
-      "y": 1295
+      "x": 0,
+      "y": 1144
     }
   }
 }
