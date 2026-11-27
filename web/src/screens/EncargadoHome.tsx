@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { Profile } from '../lib/types'
+import { initials } from '../lib/format'
+import { ROLE_LABEL, type Profile } from '../lib/types'
 import { BottomBar, type BottomBarItem } from '../components/BottomBar'
 import { CajaIcon, CopaIcon, EstrellaIcon, RelojIcon, UsuariosIcon } from '../components/icons'
 import { BartenderShift } from './BartenderShift'
@@ -36,7 +37,16 @@ export function EncargadoHome({ profile }: { profile: Profile }) {
         {tab === 'clientes' && <VipCustomersTab />}
         {isAdmin && tab === 'usuarios' && <UsersTab profile={profile} />}
       </div>
-      <BottomBar items={items} active={tab} onSelect={(key) => setTab(key as Tab)} />
+      <BottomBar
+        items={items}
+        active={tab}
+        onSelect={(key) => setTab(key as Tab)}
+        identity={{
+          initials: initials(profile.full_name, ''),
+          name: profile.full_name || 'Sin nombre',
+          detail: ROLE_LABEL[profile.role],
+        }}
+      />
     </div>
   )
 }

@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "chosen": "02-comanda-clara.html",
+  "handoffs": {
+    "02-comanda-clara.html": {
+      "status": "implemented",
+      "queued": false,
+      "sentAt": "2026-11-27T12:17:58.793Z",
+      "startedAt": "2026-11-27T12:18:02.234Z",
+      "implementedAt": "2026-11-27T12:19:21.230Z",
+      "feature": "odd/tasks/gestor-ventas.md",
+      "note": "Implementado: BottomBar con botón central MENÚ (>4 opciones) que abre sidebar lateral (Drawer) con identidad y pestañas de rebalse; bartender con 4 pestañas sin cambios. Suite 73/73 + build OK.",
+      "previewUrl": "http://localhost:5173/"
+    }
+  }
+}
