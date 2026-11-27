@@ -17,6 +17,7 @@ import {
   type TicketLine,
 } from '../lib/comanda'
 import { formatDateTime, formatMoney, formatTime } from '../lib/format'
+import { filterProducts } from '../lib/search'
 import { BottomBar } from '../components/BottomBar'
 import { SectionLabel } from '../components/ScreenHead'
 import { Sheet } from '../components/Sheet'
@@ -202,6 +203,7 @@ function PriceEditorSheet({
 export function BartenderShift({ profile, embedded = false }: Props) {
   const [shift, setShift] = useState<Shift | null>(null)
   const [products, setProducts] = useState<Product[]>([])
+  const [query, setQuery] = useState('')
   const [sales, setSales] = useState<Sale[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
   const [lines, setLines] = useState<TicketLine[]>([])
@@ -493,6 +495,9 @@ export function BartenderShift({ profile, embedded = false }: Props) {
   }
 
   const productById = useMemo(() => new Map(products.map((p) => [p.id, p])), [products])
+  // Search narrows only the grid render; productById keeps the full list
+  // so comanda and report lookups are unaffected by the query.
+  const visibleProducts = filterProducts(products, query)
   const openAccountIds = useMemo(() => new Set(accounts.map((a) => a.id)), [accounts])
   // Sales noted into a still-open account are on the account tab, not on
   // the shift's collected total yet.
@@ -617,8 +622,18 @@ export function BartenderShift({ profile, embedded = false }: Props) {
         </div>
       )}
       {modeSegment}
+      {products.length > 0 && (
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar producto…"
+          aria-label="Buscar producto"
+          className="mt-3.5 h-11 w-full rounded-lg border border-hair-fuerte bg-papel px-3.5 text-[15px] text-tinta placeholder:text-tinta-suave/70"
+        />
+      )}
       <div className="mt-3.5 grid grid-cols-3 gap-2">
-        {products.map((p) => (
+        {visibleProducts.map((p) => (
           <button
             key={p.id}
             type="button"
@@ -635,6 +650,11 @@ export function BartenderShift({ profile, embedded = false }: Props) {
       {products.length === 0 && (
         <p className="mt-4 text-sm text-tinta-suave">
           No hay productos activos: el encargado los carga en “Productos”.
+        </p>
+      )}
+      {products.length > 0 && visibleProducts.length === 0 && (
+        <p className="mt-4 text-sm text-tinta-suave">
+          Ningún producto coincide con la búsqueda.
         </p>
       )}
     </>
